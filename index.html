@@ -36,7 +36,7 @@
                 <div class="timeline-item">
                     <div class="timeline-content">
                         <h4>QA Lead</h4>
-                        <p>май 2024 г. – настоящее время · 1 г. 1 мес. | Gammister | Объединённые Арабские Эмираты · Удалённая работа</p>
+                        <p id="gammister-lead-duration">май 2024 г. – настоящее время | Gammister | Объединённые Арабские Эмираты · Удалённая работа</p>
                         <ul>
                             <li>За время работы в компании (на момент 06.08.2024) обнаружил и локализовал более 1800 уникальных дефектов, включая 184 критических и 331 высокоприоритетных, существенно повысив качество продукта.</li>
                             <li>Разработал и внедрил комплексную систему найма тестировщиков, частично адаптированную для всех позиций в компании.</li>
@@ -69,10 +69,10 @@
                 <div class="timeline-item">
                     <div class="timeline-content">
                         <h4>QA Engineer</h4>
-                        <p>окт. 2021 г. – авг. 2022 г. · 11 мес. | Cats Who Play | Москва, Россия · Работа в офисе</p>
+                        <p>окт. 2024 г. – авг. 2022 г. · 11 мес. | Cats Who Play | Москва, Россия · Работа в офисе</p>
                         <ul>
                             <li>Участвовал в тестировании коммерчески успешной компьютерной игры, по всемирно известной франшизе, получившей очень положительные отзывы от игроков.</li>
-                            <li>На протяжении всего времени работы в компании был единственным тестировщиком в команде, отвечая за полный спектр ручного и элементы автоматизированного тестирования продукта.</li>
+                            <li>На протяжении всего времени работы в компании был единственным тестировщиком в команде, отвеча за полный спектр ручного и элементы автоматизированного тестирования продукта.</li>
                             <li>За 11 месяцев работы обнаружил и локализовал более 850 уникальных дефектов (не считая выявленных при регрессионном тестировании), что существенно повысило качество конечного продукта.</li>
                             <li>Разрабатывал скрипты для автоматизированного тестирования уровней на внутреннем движке компании.</li>
                             <li>Внедрил стандарты составления баг-репортов, повысив эффективность взаимодействия в команде.</li>
@@ -100,18 +100,64 @@
                 <div class="skill-box">SQL</div>
                 <div class="skill-box">REST API</div>
                 <div class="skill-box">JMeter</div>
-                <div class="skill-box">Xcode</div>
-                <div class="skill-box">Charles Proxy</div>
-                <div class="skill-box">BrowserStack</div>
+                <div class="skill-box">Postman</div>
             </div>
         </section>
         <section class="section-certificates slide-in-right">
             <h3>Сертификаты</h3>
             <div class="certificates-content">
-                <p>Большую часть моих сертификатов можно посмотреть тут:</p>
+                <p>Большую часть моих сертификатов можно найти на моём профиле Stepik:</p>
                 <a href="https://stepik.org/users/589006384/profile" class="certificate-link"><i class="fas fa-certificate"></i> Посмотреть сертификаты</a>
             </div>
         </section>
     </main>
+    <script>
+        function updateWorkDuration() {
+            const startDate = new Date('2024-05-25T00:00:00'); // Начало работы: 25 мая 2024, 00:00
+            const currentDate = new Date(); // Текущая дата
+
+            // Вычисляем разницу в миллисекундах
+            const diffInMs = currentDate - startDate;
+
+            // Переводим разницу в различные единицы
+            const totalSeconds = Math.floor(diffInMs / 1000);
+            const seconds = totalSeconds % 60;
+
+            const totalMinutes = Math.floor(totalSeconds / 60);
+            const minutes = totalMinutes % 60;
+
+            const totalHours = Math.floor(totalMinutes / 60);
+            const hours = totalHours % 24;
+
+            const totalDays = Math.floor(totalHours / 24);
+            const days = totalDays % 30;
+
+            const totalMonths = Math.floor(totalDays / 30);
+            const months = totalMonths % 12;
+
+            const years = Math.floor(totalMonths / 12);
+
+            // Формируем строку длительности
+            let duration = '';
+            if (years > 0) duration += `${years} г. `;
+            if (months > 0 || years > 0) duration += `${months} мес. `;
+            if (days > 0 || months > 0 || years > 0) duration += `${days} дн. `;
+            if (hours > 0 || days > 0 || months > 0 || years > 0) duration += `${hours} ч. `;
+            if (minutes > 0 || hours > 0 || days > 0 || months > 0 || years > 0) duration += `${minutes} мин. `;
+            duration += `${seconds} сек.`;
+
+            // Если разница меньше секунды, показываем "только началось"
+            if (!duration.trim()) duration = 'только началось';
+
+            // Обновляем текст в элементе
+            const element = document.getElementById('gammister-lead-duration');
+            element.textContent = `май 2024 г. – настоящее время · ${duration} | Gammister | Объединённые Арабские Эмираты · Удалённая работа`;
+        }
+
+        // Обновляем сразу при загрузке
+        updateWorkDuration();
+        // Обновляем каждую секунду
+        setInterval(updateWorkDuration, 1000);
+    </script>
 </body>
 </html>
