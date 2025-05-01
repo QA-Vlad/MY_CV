@@ -26,8 +26,8 @@ header {
 }
 
 .profile-photo {
-    width: 120px;
-    height: 120px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
 }
 
@@ -40,6 +40,7 @@ header {
 .contacts a {
     color: #fff;
     text-decoration: none;
+    font-size: 0.9rem;
 }
 
 .contacts a:hover {
@@ -206,4 +207,16 @@ h3 {
     .skills-grid {
         grid-template-columns: 1fr;
     }
+}
+
+.header-text p {
+    font-size: 0.9rem;
+    margin: 8px 0 10px 0;
+    color: #ffffff;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.header-text p i {
+    margin-right: 5px;
 }
