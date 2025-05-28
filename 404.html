@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>CV Владлен Кузнецов - Перенаправление...</title> <!-- Переведено -->
+    <script type="text/javascript">
+      // Сегмент скрипта для spa-github-pages для перенаправления на index.html
+      // и сохранения предполагаемого пути в sessionStorage.
+      // Настройте segmentCount в соответствии со структурой вашего репозитория.
+      // Для сайта проекта (username.github.io/repoName/), segmentCount равен 1.
+      var segmentCount = 1;
+
+      var l = window.location;
+      // Рассчитываем базовый путь для перенаправления (например, /MY_CV/)
+      var homePath = l.pathname.split('/').slice(0, 1 + segmentCount).join('/') +
+                     (l.pathname.endsWith('/') && l.pathname.split('/').slice(0, 1 + segmentCount).join('/').length === l.pathname.length -1 ? '' : '/');
+
+      // Извлекаем сегмент пути после имени репозитория (например, "en" или "ru?param=1")
+      var targetPath = l.pathname.slice(1).split('/').slice(segmentCount).join('/') + l.search + l.hash;
+
+      sessionStorage.redirect = targetPath; // Сохраняем целевой путь
+      l.replace(homePath); // Перенаправляем на homePath (например, /MY_CV/index.html или /MY_CV/)
+    </script>
+  </head>
+  <body>
+    Если вас не перенаправило автоматически, пожалуйста, <a href="/MY_CV/">нажмите здесь</a>. <!-- Переведено -->
+  </body>
+</html>
