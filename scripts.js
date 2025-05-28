@@ -29,7 +29,7 @@ const basePath = '/MY_CV'; // Базовый путь вашего репози�
 async function fetchTranslations(lang) {
     try {
         // Запрашиваем JSON файл с переводами, добавляя v=timestamp для предотвращения кеширования
-        const response = await fetch(`translations/${lang}.json?v=${new Date().getTime()}`);
+        const response = await fetch(`${basePath}/translations/${lang}.json?v=${new Date().getTime()}`);
         if (!response.ok) {
             // Если файл не найден или другая ошибка сервера
             console.error(`Не удалось загрузить ${lang}.json. Статус: ${response.status}`);
