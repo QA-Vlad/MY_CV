@@ -158,6 +158,65 @@ body.loading-translations [data-lang-key] {
     background-color: #21867a;
 }
 
+/* Styles for Articles Section */
+.articles-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* For spacing if multiple articles are added */
+}
+
+.article-item {
+    background-color: #f1faee; /* Consistent with timeline-content */
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0; /* Optional: for a bit more definition */
+}
+
+.article-item .article-title-link {
+    text-decoration: none; /* Remove underline from link */
+    color: inherit; /* Make link inherit color from h4 */
+}
+
+.article-item .article-title-link:hover h4 {
+    text-decoration: underline; /* Underline the h4 text when link is hovered */
+    color: #21867a; /* Optional: slightly darker color on hover for emphasis */
+}
+
+.article-item h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #2a9d8f; /* Theme color for titles */
+    font-size: 1.1rem;
+}
+
+.article-item p {
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.article-link {
+    display: inline-flex;
+    align-items: center;
+    background-color: #2a9d8f;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.article-link i {
+    margin-right: 8px;
+}
+
+.article-link:hover {
+    background-color: #21867a;
+}
+
+
 @keyframes slideInLeft {
     from { transform: translateX(-100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
@@ -180,9 +239,14 @@ body.loading-translations [data-lang-key] {
     animation: slideInLeft 0.5s ease-in 0.7s forwards;
 }
 
-.section-certificates {
+.section-certificates { /* This style was present, might be for future use or copy-pasted */
     animation: slideInRight 0.5s ease-in 0.9s forwards;
 }
+
+.section-articles {
+    animation: slideInRight 0.5s ease-in 0.9s forwards; /* New animation for articles */
+}
+
 
 @media (max-width: 768px) {
     .timeline {

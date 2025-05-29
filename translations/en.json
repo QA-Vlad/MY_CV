@@ -57,6 +57,11 @@
   "certificates-text": "Most of my certificates can be found here:",
   "certificates-link": "View Certificates",
 
+  "articles-title": "My Articles",
+  "article-1-title": "How I Sped Up Log Analysis in a Mobile Game with a Python Converter",
+  "article-1-description": "My first publication on Habr. I'm proud of it as it managed to pass the strict 'sandbox' selection and immediately get into the main section of the site.",
+  "article-1-link-text": "Read on Habr",
+
   "year-abbr": "yr",
   "month-abbr": "mos",
   "day-abbr": "days",
