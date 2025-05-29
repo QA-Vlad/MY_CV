@@ -10,14 +10,16 @@ body {
 .resume-header-container {
     background-color: #2a9d8f;
     color: #fff;
-    padding: 10px 20px;
+    padding: 10px 20px; /* Оставляем паддинги */
     border-bottom: 2px solid #21867a;
     margin-bottom: 10px;
     display: flex;
     align-items: center;
-    justify-content: center; /* Центрируем заголовок и кнопку */
+    justify-content: center;
     flex-wrap: wrap;
-    gap: 15px; /* Увеличим немного отступ между заголовком и кнопкой */
+    gap: 15px;
+    width: 100%; /* Добавляем это */
+    box-sizing: border-box; /* Важно, если есть padding и width: 100% */
 }
 
 .resume-header-container h1 {
