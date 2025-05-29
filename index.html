@@ -23,7 +23,7 @@
     <meta property="og:url" content="https://qa-vlad.github.io/MY_CV/ru">
     <title>Загрузка CV...</title> <!-- Начальный заголовок -->
     <link rel="icon" type="image/x-icon" href="CV.png">
-    <link rel="stylesheet" href="styles.css?v=1.0.1"> <!-- Не забудьте обновить версию, если меняли CSS -->
+    <link rel="stylesheet" href="styles.css?v=1.0.2"> <!-- Обновите версию, если будете менять CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body class="loading-translations">
@@ -131,7 +131,15 @@
                 <div class="skill-box">Xcode</div>
             </div>
         </section>
-        <section class="section-articles slide-in-right">
+        <section class="section-languages slide-in-right"> <!-- Анимация slide-in-right для чередования -->
+            <h3 data-lang-key="languages-title"></h3>
+            <ul class="languages-list">
+                <li class="language-item" data-lang-key="lang-english"></li>
+                <li class="language-item" data-lang-key="lang-russian"></li>
+                <li class="language-item" data-lang-key="lang-vietnamese"></li>
+            </ul>
+        </section>
+        <section class="section-articles slide-in-left"> <!-- Сменим анимацию для статей на slide-in-left -->
             <h3 data-lang-key="articles-title"></h3>
             <div class="articles-container">
                 <div class="article-item">
@@ -143,21 +151,12 @@
                         <i class="fas fa-book-open"></i> <span data-lang-key="article-1-link-text"></span>
                     </a>
                 </div>
-                <!-- Сюда можно будет добавлять другие статьи в будущем -->
             </div>
         </section>
     </main>
 
-    <!-- Восстановленный скрипт Cloudflare для email -->
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-
-    <!-- Ваш основной скрипт теперь подключается из отдельного файла -->
     <script src="scripts.js"></script>
-
-    <!-- Скрипты Cloudflare Challenge Platform -->
-    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9395bfd2ff9969f7',t:'MTc0NjE3MDM1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
-    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93a8dbfc182add20',t:'MTc0NjM3MDczOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
-    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93b152ed6edbb056',t:'MTc0NjQ1OTQ5Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
-    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93b15e2288c4bfb5',t:'MTc0NjQ1OTk1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+    <!-- Cloudflare Scripts -->
 </body>
 </html>

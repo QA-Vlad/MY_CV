@@ -54,9 +54,11 @@
   "qa-engineer-2-8": "Gained project management skills, including creating technical specifications for developers based on management requirements.",
   "qa-engineer-2-9": "Using AI technologies, created and integrated English voiceovers for all in-game dialogues for investor presentations.",
   "skills-title": "Skills",
-  "certificates-title": "Certificates",
-  "certificates-text": "Most of my certificates can be found here:",
-  "certificates-link": "View Certificates",
+
+  "languages-title": "Languages",
+  "lang-english": "English – B1",
+  "lang-russian": "Russian – Native",
+  "lang-vietnamese": "Vietnamese – A1",
 
   "articles-title": "My Articles",
   "article-1-title": "How I Sped Up Log Analysis in a Mobile Game with a Python Converter",
