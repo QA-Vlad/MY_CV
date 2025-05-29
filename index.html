@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="ru"> <!-- Этот атрибут будет обновляться JS -->
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GPXMYZY81W"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-GPXMYZY81W');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="index, follow">
@@ -13,7 +23,7 @@
     <meta property="og:url" content="https://qa-vlad.github.io/MY_CV/ru">
     <title>Загрузка CV...</title> <!-- Начальный заголовок -->
     <link rel="icon" type="image/x-icon" href="CV.png">
-    <link rel="stylesheet" href="styles.css?v=1.0.1"> <!-- перед каждым пушем ставить на 1 больше -->
+    <link rel="stylesheet" href="styles.css?v=1.0.1"> <!-- Не забудьте обновить версию, если меняли CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body class="loading-translations">
@@ -49,9 +59,7 @@
             <div class="timeline">
                 <div class="timeline-item">
                     <div class="timeline-content">
-                        <a href="https://habr.com/ru/articles/908842" target="_blank" rel="noopener noreferrer" class="article-title-link">
-                           <h4 data-lang-key="qa-lead-title"></h4>
-                        </a>
+                       <h4 data-lang-key="qa-lead-title"></h4>
                         <p id="gammister-lead-duration" data-lang-key="qa-lead-duration-full"></p>
                         <ul>
                             <li data-lang-key="qa-lead-1"></li>
