@@ -123,8 +123,9 @@ h3 {
     border-radius: 5px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     margin-left: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 30px; /* Основной отступ между блоками опыта */
 }
+/* Убираем нижний отступ у последнего элемента или если за item идет connector */
 .timeline > *:last-child .timeline-content,
 .timeline > .timeline-connector:last-child {
     margin-bottom: 0;
@@ -153,7 +154,7 @@ h3 {
     left: 20px;
     top: 12px;
     width: 2px;
-    height: 100%;
+    height: 100%; /* Линия идет до конца родительского timeline-item */
     background-color: #2a9d8f;
 }
 /* Линия для последнего item в HTML (самого старого по хронологии) */
@@ -235,7 +236,6 @@ body.loading-translations [data-lang-key] {
     background-color: #21867a;
 }
 
-/* Styles for Languages Section */
 .languages-list {
     list-style-type: none;
     padding: 0;
@@ -255,7 +255,6 @@ body.loading-translations [data-lang-key] {
     font-size: 0.95rem;
 }
 
-/* Styles for Articles Section */
 .articles-container {
     display: flex;
     flex-direction: column;
@@ -556,9 +555,8 @@ body.loading-translations [data-lang-key] {
     }
 
     /* Стили позиционирования для печати (если отличаются от десктопа/мобильных) */
-    /* Можно оставить стандартные значения, если они подходят, или задать специфичные для печати */
     .timeline {
-        /* padding-left: 40px !important; */ /* Если нужно стандартное значение */
+        /* padding-left: 40px !important; */
     }
     .timeline-item::before {
         /* left: 13px !important; */
