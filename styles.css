@@ -7,6 +7,43 @@ body {
     padding: 0;
 }
 
+.resume-header-container {
+    background-color: #2a9d8f;
+    color: #fff;
+    padding: 10px 20px;
+    border-bottom: 2px solid #21867a;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Центрируем заголовок и кнопку */
+    flex-wrap: wrap;
+    gap: 15px; /* Увеличим немного отступ между заголовком и кнопкой */
+}
+
+.resume-header-container h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    text-align: center; /* Дополнительно для центрирования текста заголовка */
+}
+
+.action-button {
+    padding: 5px 10px; /* Уменьшаем padding для уменьшения кнопки */
+    background-color: #fff;
+    color: #2a9d8f;
+    border: 1px solid #2a9d8f;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8rem; /* Уменьшаем размер шрифта для кнопки */
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.action-button:hover {
+    background-color: #e0f2f1;
+    color: #21867a;
+}
+
+
 header {
     background-color: #2a9d8f;
     color: #fff;
@@ -103,6 +140,17 @@ h3 {
     margin-left: 20px;
 }
 
+.timeline-content .article-title-link { /* Специфичность для ссылок-заголовков в таймлайне */
+    text-decoration: none;
+    color: inherit;
+}
+
+.timeline-content .article-title-link:hover h4 {
+    text-decoration: underline;
+    color: #21867a;
+}
+
+
 .skills-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -123,11 +171,6 @@ body.loading-translations [data-lang-key] {
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
 }
-
-/*.skill-box:hover {*/
-/*    transform: scale(1.1);*/
-/*    border-color: #2a9d8f;*/
-/*}*/
 
 .section-certificates .certificates-content {
     display: flex;
@@ -162,31 +205,31 @@ body.loading-translations [data-lang-key] {
 .articles-container {
     display: flex;
     flex-direction: column;
-    gap: 20px; /* For spacing if multiple articles are added */
+    gap: 20px;
 }
 
 .article-item {
-    background-color: #f1faee; /* Consistent with timeline-content */
+    background-color: #f1faee;
     padding: 15px;
     border-radius: 5px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    border: 1px solid #e0e0e0; /* Optional: for a bit more definition */
+    border: 1px solid #e0e0e0;
 }
 
 .article-item .article-title-link {
-    text-decoration: none; /* Remove underline from link */
-    color: inherit; /* Make link inherit color from h4 */
+    text-decoration: none;
+    color: inherit;
 }
 
 .article-item .article-title-link:hover h4 {
-    text-decoration: underline; /* Underline the h4 text when link is hovered */
-    color: #21867a; /* Optional: slightly darker color on hover for emphasis */
+    text-decoration: underline;
+    color: #21867a;
 }
 
 .article-item h4 {
     margin-top: 0;
     margin-bottom: 10px;
-    color: #2a9d8f; /* Theme color for titles */
+    color: #2a9d8f;
     font-size: 1.1rem;
 }
 
@@ -239,12 +282,12 @@ body.loading-translations [data-lang-key] {
     animation: slideInLeft 0.5s ease-in 0.7s forwards;
 }
 
-.section-certificates { /* This style was present, might be for future use or copy-pasted */
+.section-certificates {
     animation: slideInRight 0.5s ease-in 0.9s forwards;
 }
 
 .section-articles {
-    animation: slideInRight 0.5s ease-in 0.9s forwards; /* New animation for articles */
+    animation: slideInRight 0.5s ease-in 0.9s forwards;
 }
 
 
@@ -270,11 +313,21 @@ body.loading-translations [data-lang-key] {
         gap: 10px;
         justify-content: flex-start;
     }
+    .resume-header-container {
+        justify-content: center;
+    }
 }
 
 @media (max-width: 480px) {
     .skills-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+     .resume-header-container h1 { /* Уменьшим заголовок на очень маленьких экранах */
+        font-size: 1.3rem;
+    }
+    .action-button { /* Уменьшим кнопку еще немного на очень маленьких экранах */
+        font-size: 0.75rem;
+        padding: 4px 8px;
     }
 }
 
@@ -288,4 +341,145 @@ body.loading-translations [data-lang-key] {
 
 .header-text p i {
     margin-right: 5px;
+}
+
+@media print {
+    body {
+        font-size: 10pt;
+        color: #000 !important;
+        background-color: #fff !important;
+        margin: 0;
+        padding: 0;
+    }
+
+    .resume-header-container {
+        background-color: #eee !important;
+        color: #000 !important;
+        border-bottom: 1px solid #ccc !important;
+        padding: 10px;
+        justify-content: center !important;
+        text-align: center !important; /* Добавлено для лучшего центрирования H1 */
+    }
+
+    header {
+        background-color: #f9f9f9 !important;
+        color: #000 !important;
+        padding: 15px;
+        border-bottom: 1px solid #ddd !important;
+        box-shadow: none !important;
+    }
+
+    main {
+        box-shadow: none !important;
+        border: none !important;
+        margin: 10mm auto;
+        padding: 0;
+        max-width: 100%;
+    }
+
+    #language-toggle,
+    #download-pdf-button,
+    script,
+    iframe[src*="cloudflare"],
+    iframe[src*="challenge-platform"] {
+        display: none !important;
+    }
+
+    a {
+        color: #0056b3 !important;
+        text-decoration: underline !important;
+    }
+    a[href^="http"]::after,
+    a[href^="mailto"]::after {
+        content: " (" attr(href) ")";
+        font-size: 0.8em;
+        color: #555 !important;
+        word-break: break-all;
+    }
+    a[href^="#"]::after {
+        content: "" !important;
+    }
+    .contacts a[href*="linkedin.com"]::after,
+    .contacts a[href*="t.me"]::after,
+    .contacts a[href*="mailto:"]::after,
+    .article-link[href^="http"]::after,
+    .article-title-link[href^="http"]::after,
+    .timeline-content .article-title-link[href^="http"]::after {
+         content: "" !important;
+    }
+
+
+    .slide-in-left, .slide-in-right {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    .profile-photo {
+        width: 100px !important;
+        height: 100px !important;
+        margin: 0 auto 10px auto;
+    }
+    .header-content {
+        flex-direction: column !important;
+        text-align: center !important;
+        gap: 10px !important;
+    }
+    .contacts {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px !important;
+    }
+    .contacts a {
+        color: #0056b3 !important;
+    }
+    .header-text h1, .header-text h2, .header-text p {
+        color: #000 !important;
+        opacity: 1 !important;
+        text-align: center !important;
+    }
+     .header-text p i {
+        margin-right: 3px;
+    }
+
+    .timeline-item::before, .timeline-item::after {
+        background-color: #ccc !important;
+    }
+    .timeline-content, .skill-box, .article-item {
+        background-color: #f9f9f9 !important;
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+        padding: 10px;
+        page-break-inside: avoid;
+    }
+
+    h3, h4 {
+        color: #333 !important;
+        border-bottom-color: #ccc !important;
+        padding-bottom: 3px;
+        margin-bottom: 10px;
+        page-break-after: avoid;
+    }
+
+    .skills-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+        page-break-inside: avoid;
+    }
+
+    section {
+        page-break-inside: avoid;
+        margin-bottom: 15px;
+    }
+    ul {
+        padding-left: 20px;
+        page-break-inside: avoid;
+    }
+    li {
+        margin-bottom: 5px;
+    }
+
+    body.loading-translations [data-lang-key],
+    body.loading-translations {
+        opacity: 1 !important;
+    }
 }
