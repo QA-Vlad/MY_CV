@@ -15,9 +15,9 @@ body {
     margin-bottom: 10px;
     display: flex;
     align-items: center;
-    justify-content: center; /* Центрируем заголовок и кнопку */
+    justify-content: center;
     flex-wrap: wrap;
-    gap: 15px; /* Отступ между заголовком и кнопкой */
+    gap: 15px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -108,29 +108,13 @@ h3 {
 
 .timeline-item {
     position: relative;
-    margin-bottom: 30px;
 }
 
-.timeline-item::before {
-    content: '';
-    position: absolute;
-    left: 15px;
-    top: 0;
-    width: 12px;
-    height: 12px;
-    background-color: #2a9d8f;
-    border-radius: 50%;
-    border: 2px solid #fff;
-}
-
-.timeline-item::after {
-    content: '';
-    position: absolute;
-    left: 20px;
-    top: 12px;
+.timeline-connector {
+    position: relative;
+    margin-left: 20px;
     width: 2px;
-    height: 100%;
-    background-color: #2a9d8f;
+    height: 50px; /* Высота пунктирной линии для десктопа */
 }
 
 .timeline-content {
@@ -139,7 +123,56 @@ h3 {
     border-radius: 5px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     margin-left: 20px;
+    margin-bottom: 30px;
 }
+.timeline > *:last-child .timeline-content,
+.timeline > .timeline-connector:last-child {
+    margin-bottom: 0;
+}
+.timeline-item:has(+ .timeline-connector) .timeline-content {
+    margin-bottom: 0;
+}
+
+
+.timeline-item::before { /* Кружок */
+    content: '';
+    position: absolute;
+    left: 13px; /* Скорректировано для центрирования с обводкой */
+    top: 0;
+    width: 12px;
+    height: 12px;
+    background-color: #2a9d8f;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    z-index: 1;
+}
+
+.timeline-item::after { /* Сплошная линия, идущая вниз от кружка */
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 12px;
+    width: 2px;
+    height: 100%;
+    background-color: #2a9d8f;
+}
+/* Линия для последнего item в HTML (самого старого по хронологии) */
+.timeline > .timeline-item:last-child:not(:has(+ .timeline-connector))::after {
+    height: 100%; /* или display: none; если линия под ним не нужна */
+}
+
+
+.timeline-connector.promotion-line {
+    background-image: repeating-linear-gradient(
+        to bottom,
+        #2a9d8f,
+        #2a9d8f 3px,
+        transparent 3px,
+        transparent 6px
+    );
+    background-color: transparent;
+}
+
 
 .timeline-content .article-title-link {
     text-decoration: none;
@@ -207,7 +240,7 @@ body.loading-translations [data-lang-key] {
     list-style-type: none;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Адаптивные колонки */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 15px;
 }
 
@@ -308,11 +341,11 @@ body.loading-translations [data-lang-key] {
 }
 
 .section-certificates {
-    animation: slideInRight 0.5s ease-in 0.9s forwards; /* Оставил на случай если секция вернется */
+    animation: slideInRight 0.5s ease-in 0.9s forwards;
 }
 
 .section-articles {
-    animation: slideInLeft 0.5s ease-in 0.9s forwards; /* Сменил на left и подогнал задержку */
+    animation: slideInLeft 0.5s ease-in 0.9s forwards;
 }
 
 
@@ -321,16 +354,32 @@ body.loading-translations [data-lang-key] {
         padding-left: 20px;
     }
     .timeline-item::before {
-        left: 5px;
+        left: 3px; /* Скорректировано для центрирования на мобильных */
     }
     .timeline-item::after {
         left: 10px;
     }
+     .timeline-connector {
+        margin-left: 10px;
+        height: 45px; /* Высота пунктирной линии для мобильных */
+    }
+
+    .timeline-content {
+        margin-bottom: 20px;
+    }
+    .timeline > *:last-child .timeline-content,
+    .timeline > .timeline-connector:last-child {
+        margin-bottom: 0;
+    }
+    .timeline-item:has(+ .timeline-connector) .timeline-content {
+        margin-bottom: 0;
+    }
+
     .skills-grid {
         grid-template-columns: repeat(2, 1fr);
     }
     .languages-list {
-        grid-template-columns: 1fr; /* Языки в одну колонку на мобильных */
+        grid-template-columns: 1fr;
     }
     .header-content {
         flex-direction: column;
@@ -348,7 +397,7 @@ body.loading-translations [data-lang-key] {
 
 @media (max-width: 480px) {
     .skills-grid {
-        grid-template-columns: repeat(2, 1fr); /* Оставим 2 для навыков, если помещаются */
+        grid-template-columns: repeat(2, 1fr);
     }
      .resume-header-container h1 {
         font-size: 1.3rem;
@@ -470,10 +519,59 @@ body.loading-translations [data-lang-key] {
         margin-right: 3px;
     }
 
-    .timeline-item::before, .timeline-item::after {
-        background-color: #ccc !important;
+    .timeline-content {
+        margin-bottom: 15px !important;
     }
-    .timeline-content, .skill-box, .language-item, .article-item { /* Добавлен .language-item */
+    .timeline > *:last-child .timeline-content,
+    .timeline > .timeline-connector:last-child {
+        margin-bottom: 0 !important;
+    }
+    .timeline-item:has(+ .timeline-connector) .timeline-content {
+        margin-bottom: 0 !important;
+    }
+
+
+    .timeline-item::before {
+        background-color: #ccc !important;
+        border-color: #fff !important;
+    }
+    .timeline-item::after {
+        background-color: #ccc !important;
+        height: 100% !important;
+    }
+     .timeline > .timeline-item:last-child:not(:has(+ .timeline-connector))::after {
+        display: none !important; /* Скрываем линию у последнего элемента при печати, если она не нужна */
+    }
+
+    .timeline-connector.promotion-line {
+        height: 15px !important; /* Высота пунктирной линии для печати */
+        background-image: repeating-linear-gradient(
+            to bottom,
+            #000,
+            #000 3px,
+            transparent 3px,
+            transparent 6px
+        ) !important;
+        background-color: transparent !important;
+    }
+
+    /* Стили позиционирования для печати (если отличаются от десктопа/мобильных) */
+    /* Можно оставить стандартные значения, если они подходят, или задать специфичные для печати */
+    .timeline {
+        /* padding-left: 40px !important; */ /* Если нужно стандартное значение */
+    }
+    .timeline-item::before {
+        /* left: 13px !important; */
+    }
+     .timeline-item::after {
+        /* left: 20px !important; */
+    }
+    .timeline-connector {
+        /* margin-left: 20px !important; */
+    }
+
+
+    .timeline-content, .skill-box, .language-item, .article-item {
         background-color: #f9f9f9 !important;
         border: 1px solid #ddd !important;
         box-shadow: none !important;
@@ -489,8 +587,8 @@ body.loading-translations [data-lang-key] {
         page-break-after: avoid;
     }
 
-    .skills-grid, .languages-list { /* Добавлен .languages-list */
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important; /* Для языков можно настроить иначе, если нужно */
+    .skills-grid, .languages-list {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
         page-break-inside: avoid;
     }
 

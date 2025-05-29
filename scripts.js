@@ -7,72 +7,60 @@
   // Если был сохраненный путь, и он не пустой и не просто '/'
   if (redirect && redirect !== '' && redirect !== '/') {
     var l = window.location;
-    // l.pathname на этом этапе обычно /MY_CV/ (или /MY_CV/index.html в зависимости от сервера)
-    // redirect может быть 'en', 'ru', или 'en?queryparams'
-    // Мы хотим, чтобы новый URL был /MY_CV/en или /MY_CV/ru
     var newRedirectPath = redirect.startsWith('/') ? redirect.substring(1) : redirect;
-    // Собираем новый полный путь: текущий путь (обычно /MY_CV/) + newRedirectPath
     var newFullPath = (l.pathname.endsWith('/') ? l.pathname : l.pathname + '/') + newRedirectPath;
-
-    // Заменяем текущий URL в истории браузера на новый, без перезагрузки страницы
     history.replaceState(null, '', newFullPath);
   }
 })();
 
 
-let currentLang = 'ru'; // Язык по умолчанию, будет обновлен из URL
-let loadedTranslations = {}; // Загруженные переводы
-const toggleButton = document.getElementById('language-toggle'); // Кнопка переключения языка
-const basePath = '/MY_CV'; // Базовый путь вашего репозитория на GitHub Pages
+let currentLang = 'ru'; // Язык по умолчанию
+let loadedTranslations = {};
+const toggleButton = document.getElementById('language-toggle');
+const basePath = '/MY_CV'; // Базовый путь репозитория
 
 // Асинхронная функция для загрузки файлов перевода
 async function fetchTranslations(lang) {
     try {
-        // Запрашиваем JSON файл с переводами, добавляя v=timestamp для предотвращения кеширования
-        const response = await fetch(`${basePath}/translations/${lang}.json?v=${new Date().getTime()}`);
+        const response = await fetch(`${basePath}/translations/${lang}.json?v=${new Date().getTime()}`); // v=timestamp для предотвращения кеширования
         if (!response.ok) {
-            // Если файл не найден или другая ошибка сервера
             console.error(`Не удалось загрузить ${lang}.json. Статус: ${response.status}`);
-            if (lang !== 'ru') { // Предотвращаем бесконечный цикл, если сам 'ru.json' не загружается
+            if (lang !== 'ru') {
                 console.warn(`Выполняется откат на 'ru' с языка '${lang}'`);
-                currentLang = 'ru'; // Немедленно обновляем глобальный currentLang при попытке отката
-                return await fetchTranslations('ru'); // Пытаемся загрузить язык по умолчанию ('ru')
+                currentLang = 'ru';
+                return await fetchTranslations('ru'); // Попытка загрузить язык по умолчанию
             }
-            return {}; // Возвращаем пустой объект, если 'ru' также не удалось загрузить
+            return {};
         }
-        currentLang = lang; // Язык успешно загружен, обновляем глобальный currentLang
-        return await response.json(); // Возвращаем распарсенный JSON
+        currentLang = lang;
+        return await response.json();
     } catch (error) {
-        // Если произошла сетевая ошибка или другая ошибка при запросе
         console.error(`Ошибка при загрузке переводов для ${lang}:`, error);
         if (lang !== 'ru') {
             console.warn(`Выполняется откат на 'ru' с языка '${lang}' из-за ошибки.`);
-            currentLang = 'ru'; // Немедленно обновляем глобальный currentLang при попытке отката
-            return await fetchTranslations('ru'); // Пытаемся загрузить язык по умолчанию ('ru')
+            currentLang = 'ru';
+            return await fetchTranslations('ru');
         }
-        return {}; // Возвращаем пустой объект в случае ошибки
+        return {};
     }
 }
 
 // Функция для применения загруженных переводов к элементам страницы
 function applyTranslations() {
     try {
-        // Если переводы не загружены или объект переводов пуст
         if (Object.keys(loadedTranslations).length === 0) {
-            console.warn("Переводы не загружены или пусты. Отображение с настройками по умолчанию или существующим содержимым.");
-            document.title = document.title || 'CV'; // Используем существующий title или дефолт
+            console.warn("Переводы не загружены или пусты. Отображение с настройками по умолчанию.");
+            document.title = document.title || 'CV';
             if (toggleButton) {
                 const defaultButtonText = currentLang === 'ru' ? 'EN' : 'RU';
                 toggleButton.textContent = loadedTranslations['lang-toggle-text'] || defaultButtonText;
             }
-            // Обновляем текст кнопки PDF, если она есть и переводы не загружены
             const downloadPdfButton = document.getElementById('download-pdf-button');
             if (downloadPdfButton) {
                  const defaultPdfButtonText = currentLang === 'ru' ? 'Скачать PDF' : 'Download PDF';
                  downloadPdfButton.textContent = loadedTranslations['download-pdf-button-text'] || defaultPdfButtonText;
             }
-
-            updateWorkDuration(); // Все равно пытаемся обновить длительность, там есть фоллбэки
+            updateWorkDuration();
             const ogUrlMeta = document.querySelector('meta[property="og:url"]');
             if (ogUrlMeta) {
                  ogUrlMeta.content = `${window.location.origin}${basePath}/${currentLang}`;
@@ -103,7 +91,6 @@ function applyTranslations() {
         document.querySelectorAll('[data-lang-key]').forEach(element => {
             const key = element.getAttribute('data-lang-key');
             if (loadedTranslations[key]) {
-                // Для кнопки используем textContent, для остальных innerHTML
                 if (element.tagName === 'BUTTON' && (element.id === 'language-toggle' || element.id === 'download-pdf-button')) {
                     element.textContent = loadedTranslations[key];
                 } else {
@@ -115,7 +102,6 @@ function applyTranslations() {
         if (toggleButton) {
             toggleButton.textContent = loadedTranslations['lang-toggle-text'] || (currentLang === 'ru' ? 'EN' : 'RU');
         }
-        // Обновляем текст кнопки PDF, если она есть
         const downloadPdfButton = document.getElementById('download-pdf-button');
         if (downloadPdfButton && loadedTranslations['download-pdf-button-text']) {
             downloadPdfButton.textContent = loadedTranslations['download-pdf-button-text'];
@@ -152,6 +138,7 @@ if (toggleButton) {
     });
 }
 
+// Функция для обновления отображения длительности работы
 function updateWorkDuration() {
     if (Object.keys(loadedTranslations).length === 0 || !loadedTranslations['qa-lead-duration-full']) {
         const element = document.getElementById('gammister-lead-duration');
@@ -173,7 +160,7 @@ function updateWorkDuration() {
 
     const element = document.getElementById('gammister-lead-duration');
 
-    if (diffInMs < 0) {
+    if (diffInMs < 0) { // Если дата начала в будущем
          if(element && loadedTranslations['qa-lead-duration-full']) element.innerHTML = loadedTranslations['qa-lead-duration-full'];
          return;
     }
@@ -190,11 +177,12 @@ function updateWorkDuration() {
     let months = 0;
     let tempDays = totalDays;
 
+    // Приблизительный расчет лет и месяцев
     if (tempDays >= 365.25) {
         years = Math.floor(tempDays / 365.25);
         tempDays -= Math.floor(years * 365.25);
     }
-    if (tempDays >= 30.4375) {
+    if (tempDays >= 30.4375) { // Среднее количество дней в месяце
         months = Math.floor(tempDays / 30.4375);
         tempDays -= Math.floor(months * 30.4375);
     }
@@ -229,14 +217,17 @@ function updateWorkDuration() {
             if (timePart.includes(presentText)) {
                  newTimePart = timePart.replace(presentText, `${presentText} · ${durationString}`);
             } else {
+                // Это условие может быть не нужно, если строка всегда содержит "настоящее время"
                 newTimePart = `${timePart} · ${durationString}`;
             }
             element.innerHTML = `${newTimePart} | ${baseStringParts[1]} | ${baseStringParts[2]}`;
         } else {
+            // Обработка, если формат строки неожиданный
             const presentText = loadedTranslations['present-time-text'] || (currentLang === 'ru' ? 'настоящее время' : 'Present');
             element.innerHTML = `${loadedTranslations['qa-lead-duration-full'].replace(presentText, `${presentText} · ${durationString}`)}`;
         }
     } else if (element && !loadedTranslations['qa-lead-duration-full'] && Object.keys(loadedTranslations).length > 0) {
+        // Если переводы есть, но конкретного ключа нет (маловероятно для этой функции)
         element.innerHTML = durationString;
     }
 }
@@ -247,9 +238,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.body.classList.add('loading-translations');
     }
 
-    let langToLoad = 'ru';
+    let langToLoad = 'ru'; // Язык по умолчанию
     const path = window.location.pathname;
 
+    // Определение языка из URL
     if (path.startsWith(basePath + '/')) {
         const langSegment = path.substring(basePath.length + 1).split('/')[0];
         if (langSegment === 'en' || langSegment === 'ru') {
@@ -259,6 +251,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     currentLang = langToLoad;
 
+    // Установка корректного URL, если он не соответствует выбранному языку
     const expectedPath = `${basePath}/${currentLang}`;
     const currentPathPrefix = window.location.pathname.substring(0, expectedPath.length);
 
@@ -268,7 +261,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await changeLanguage(currentLang);
 
-    setInterval(updateWorkDuration, 1000);
+    setInterval(updateWorkDuration, 1000); // Обновление таймера каждую секунду
 
     const downloadPdfButton = document.getElementById('download-pdf-button');
     if (downloadPdfButton) {
@@ -277,6 +270,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Добавление target="_blank" для внешних ссылок
     document.querySelectorAll('a[href^="http"], a[href^="mailto:"]').forEach(link => {
         let isExternal = true;
         try {
@@ -285,20 +279,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 isExternal = false;
             }
         } catch (e) {
-            //
+            // Игнорируем ошибки парсинга URL, считаем ссылку внешней
         }
 
         if (link.protocol === "mailto:" || isExternal) {
-            // Проверяем, не является ли ссылка заголовком статьи или опытом работы
-            // чтобы не добавлять target="_blank" к ним, если они уже являются ссылками
             const isTitleLink = link.classList.contains('article-title-link') ||
                                 (link.parentElement && link.parentElement.classList.contains('timeline-content') && link.querySelector('h4'));
 
-            if (!isTitleLink) { // Добавляем target_blank только если это не ссылка-заголовок
+            if (!isTitleLink) {
                  link.setAttribute('target', '_blank');
                  link.setAttribute('rel', 'noopener noreferrer');
-            } else if (link.classList.contains('article-title-link')) { // Для ссылок-заголовков статей добавляем rel
-                link.setAttribute('rel', 'noopener noreferrer');
+            } else if (link.classList.contains('article-title-link')) {
+                link.setAttribute('rel', 'noopener noreferrer'); // Для ссылок-заголовков статей
             }
         }
     });
