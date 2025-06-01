@@ -45,12 +45,60 @@ async function fetchTranslations(lang) {
     }
 }
 
+// Функция для обновления мета-тегов для SEO
+function updateMetaTagsForSEO() {
+    const head = document.head;
+
+    // Удаляем старые hreflang и canonical теги, чтобы избежать дублирования
+    head.querySelectorAll('link[rel="alternate"][hreflang], link[rel="canonical"]').forEach(tag => tag.remove());
+
+    const siteOrigin = window.location.origin; // Например, https://qa-vlad.github.io
+    const ruUrl = `${siteOrigin}${basePath}/ru`;
+    const enUrl = `${siteOrigin}${basePath}/en`;
+    const defaultUrl = ruUrl; // Русская версия как x-default
+
+    let canonicalUrl = '';
+    if (currentLang === 'ru') {
+        canonicalUrl = ruUrl;
+    } else { // Предполагаем 'en'
+        canonicalUrl = enUrl;
+    }
+
+    // Добавляем канонический тег
+    const canonicalTag = document.createElement('link');
+    canonicalTag.setAttribute('rel', 'canonical');
+    canonicalTag.setAttribute('href', canonicalUrl);
+    head.appendChild(canonicalTag);
+
+    // Добавляем hreflang для русского
+    const hreflangRuTag = document.createElement('link');
+    hreflangRuTag.setAttribute('rel', 'alternate');
+    hreflangRuTag.setAttribute('hreflang', 'ru');
+    hreflangRuTag.setAttribute('href', ruUrl);
+    head.appendChild(hreflangRuTag);
+
+    // Добавляем hreflang для английского
+    const hreflangEnTag = document.createElement('link');
+    hreflangEnTag.setAttribute('rel', 'alternate');
+    hreflangEnTag.setAttribute('hreflang', 'en');
+    hreflangEnTag.setAttribute('href', enUrl);
+    head.appendChild(hreflangEnTag);
+
+    // Добавляем hreflang x-default
+    const hreflangXDefaultTag = document.createElement('link');
+    hreflangXDefaultTag.setAttribute('rel', 'alternate');
+    hreflangXDefaultTag.setAttribute('hreflang', 'x-default');
+    hreflangXDefaultTag.setAttribute('href', defaultUrl);
+    head.appendChild(hreflangXDefaultTag);
+}
+
+
 // Функция для применения загруженных переводов к элементам страницы
 function applyTranslations() {
     try {
         if (Object.keys(loadedTranslations).length === 0) {
             console.warn("Переводы не загружены или пусты. Отображение с настройками по умолчанию.");
-            document.title = document.title || 'CV';
+            document.title = document.title || 'CV Vladlen Kuznetsov'; // Установим дефолтный тайтл
             if (toggleButton) {
                 const defaultButtonText = currentLang === 'ru' ? 'EN' : 'RU';
                 toggleButton.textContent = loadedTranslations['lang-toggle-text'] || defaultButtonText;
@@ -69,7 +117,7 @@ function applyTranslations() {
         }
 
         document.documentElement.lang = loadedTranslations['lang-code'] || currentLang;
-        document.title = loadedTranslations['page-title'] || 'CV';
+        document.title = loadedTranslations['page-title'] || 'CV Vladlen Kuznetsov';
 
         const metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) metaDesc.content = loadedTranslations['meta-description'] || '';
@@ -86,7 +134,7 @@ function applyTranslations() {
         }
 
         const profilePhoto = document.getElementById('profile-photo');
-        if (profilePhoto) profilePhoto.alt = loadedTranslations['profile-photo-alt'] || 'Фото профиля';
+        if (profilePhoto) profilePhoto.alt = loadedTranslations['profile-photo-alt'] || 'Profile Photo';
 
         document.querySelectorAll('[data-lang-key]').forEach(element => {
             const key = element.getAttribute('data-lang-key');
@@ -121,13 +169,19 @@ async function changeLanguage(lang) {
 
     loadedTranslations = await fetchTranslations(lang);
     applyTranslations();
+    updateMetaTagsForSEO(); // Обновляем SEO-теги после применения переводов
 
     const newPath = `${basePath}/${currentLang}`;
     const fullNewPath = `${newPath}${window.location.search}${window.location.hash}`;
 
     const currentPathLangSegment = window.location.pathname.substring(basePath.length + 1).split('/')[0];
+    const pageTitleForHistory = loadedTranslations['page-title'] || document.title;
+
     if (currentPathLangSegment !== currentLang || window.location.pathname.substring(0, newPath.length) !== newPath) {
-         history.pushState({ lang: currentLang }, loadedTranslations['page-title'] || document.title, fullNewPath);
+         history.pushState({ lang: currentLang }, pageTitleForHistory, fullNewPath);
+    } else {
+        // Если путь уже правильный, просто обновим заголовок в истории на случай, если он изменился
+        history.replaceState({ lang: currentLang }, pageTitleForHistory, window.location.href);
     }
 }
 
@@ -146,15 +200,15 @@ function updateWorkDuration() {
             if (loadedTranslations['qa-lead-duration-full']) {
                  element.innerHTML = loadedTranslations['qa-lead-duration-full'];
             } else if (currentLang === 'ru') {
-                element.innerHTML = "май 2024 г. – настоящее время | Gammister | ...";
+                element.innerHTML = "май 2024 г. – настоящее время | Gammister | ОАЭ (удаленно)"; // Полная строка по умолчанию
             } else {
-                element.innerHTML = "May 2024 – Present | Gammister | ...";
+                element.innerHTML = "May 2024 – Present | Gammister | UAE (Remote)"; // Полная строка по умолчанию
             }
         }
         if (!loadedTranslations['qa-lead-duration-full']) return;
     }
 
-    const startDate = new Date('2024-05-25T00:00:00');
+    const startDate = new Date('2024-05-25T00:00:00'); // Убедитесь, что эта дата верна
     const currentDate = new Date();
     const diffInMs = currentDate - startDate;
 
@@ -177,12 +231,11 @@ function updateWorkDuration() {
     let months = 0;
     let tempDays = totalDays;
 
-    // Приблизительный расчет лет и месяцев
     if (tempDays >= 365.25) {
         years = Math.floor(tempDays / 365.25);
         tempDays -= Math.floor(years * 365.25);
     }
-    if (tempDays >= 30.4375) { // Среднее количество дней в месяце
+    if (tempDays >= 30.4375) {
         months = Math.floor(tempDays / 30.4375);
         tempDays -= Math.floor(months * 30.4375);
     }
@@ -204,7 +257,7 @@ function updateWorkDuration() {
     durationString += `${seconds} ${secondAbbr}`;
     durationString = durationString.trim();
 
-    if (totalSeconds === 0) {
+    if (totalSeconds === 0 && Object.keys(loadedTranslations).length > 0) { // Проверяем, что переводы загружены
          durationString = loadedTranslations['duration-just-started'] || (currentLang === 'ru' ? 'только началось' : 'just started');
     }
 
@@ -217,17 +270,14 @@ function updateWorkDuration() {
             if (timePart.includes(presentText)) {
                  newTimePart = timePart.replace(presentText, `${presentText} · ${durationString}`);
             } else {
-                // Это условие может быть не нужно, если строка всегда содержит "настоящее время"
                 newTimePart = `${timePart} · ${durationString}`;
             }
             element.innerHTML = `${newTimePart} | ${baseStringParts[1]} | ${baseStringParts[2]}`;
         } else {
-            // Обработка, если формат строки неожиданный
             const presentText = loadedTranslations['present-time-text'] || (currentLang === 'ru' ? 'настоящее время' : 'Present');
             element.innerHTML = `${loadedTranslations['qa-lead-duration-full'].replace(presentText, `${presentText} · ${durationString}`)}`;
         }
     } else if (element && !loadedTranslations['qa-lead-duration-full'] && Object.keys(loadedTranslations).length > 0) {
-        // Если переводы есть, но конкретного ключа нет (маловероятно для этой функции)
         element.innerHTML = durationString;
     }
 }
@@ -238,10 +288,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.body.classList.add('loading-translations');
     }
 
-    let langToLoad = 'ru'; // Язык по умолчанию
+    let langToLoad = 'ru';
     const path = window.location.pathname;
 
-    // Определение языка из URL
     if (path.startsWith(basePath + '/')) {
         const langSegment = path.substring(basePath.length + 1).split('/')[0];
         if (langSegment === 'en' || langSegment === 'ru') {
@@ -251,44 +300,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     currentLang = langToLoad;
 
-    // Установка корректного URL, если он не соответствует выбранному языку
     const expectedPath = `${basePath}/${currentLang}`;
     const currentPathPrefix = window.location.pathname.substring(0, expectedPath.length);
+    const pageTitleForHistory = document.title; // Запоминаем начальный title до загрузки переводов
 
     if (currentPathPrefix !== expectedPath || (window.location.pathname.length < expectedPath.length && window.location.pathname !== basePath && window.location.pathname !== basePath + '/')) {
-        history.replaceState({ lang: currentLang }, document.title, `${expectedPath}${window.location.search}${window.location.hash}`);
+        history.replaceState({ lang: currentLang }, pageTitleForHistory, `${expectedPath}${window.location.search}${window.location.hash}`);
     }
 
-    await changeLanguage(currentLang);
+    await changeLanguage(currentLang); // Это уже вызовет applyTranslations и updateMetaTagsForSEO
 
-    setInterval(updateWorkDuration, 1000); // Обновление таймера каждую секунду
+    setInterval(updateWorkDuration, 1000);
 
     const downloadPdfButton = document.getElementById('download-pdf-button');
     if (downloadPdfButton) {
         downloadPdfButton.addEventListener('click', () => {
-            // *** НАЧАЛО ИЗМЕНЕНИЙ ДЛЯ СКАЧИВАНИЯ PDF ***
             let fileName = '';
             if (currentLang === 'ru') {
                 fileName = 'Резюме - Кузнецов Владлен.pdf';
-            } else { // Предполагаем, что другой язык - 'en'
+            } else {
                 fileName = 'Resume - Kuznetsov Vladlen.pdf';
             }
-
-            // Путь к файлам PDF внутри папки /pdf/ относительно корня сайта
-            // basePath уже содержит начальный слэш, если он есть (например, /MY_CV)
             const filePath = `${basePath}/pdf/${fileName}`;
-
             const link = document.createElement('a');
             link.href = filePath;
-            link.download = fileName; // Атрибут download указывает имя файла при сохранении
-            document.body.appendChild(link); // Ссылка должна быть в DOM для клика в некоторых браузерах
+            link.download = fileName;
+            document.body.appendChild(link);
             link.click();
-            document.body.removeChild(link); // Удаляем ссылку после клика
-            // *** КОНЕЦ ИЗМЕНЕНИЙ ДЛЯ СКАЧИВАНИЯ PDF ***
+            document.body.removeChild(link);
         });
     }
 
-    // Добавление target="_blank" для внешних ссылок
     document.querySelectorAll('a[href^="http"], a[href^="mailto:"]').forEach(link => {
         let isExternal = true;
         try {
@@ -297,7 +339,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 isExternal = false;
             }
         } catch (e) {
-            // Игнорируем ошибки парсинга URL, считаем ссылку внешней
+            // Игнорируем
         }
 
         if (link.protocol === "mailto:" || isExternal) {
@@ -308,7 +350,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                  link.setAttribute('target', '_blank');
                  link.setAttribute('rel', 'noopener noreferrer');
             } else if (link.classList.contains('article-title-link')) {
-                link.setAttribute('rel', 'noopener noreferrer'); // Для ссылок-заголовков статей
+                link.setAttribute('rel', 'noopener noreferrer');
             }
         }
     });
