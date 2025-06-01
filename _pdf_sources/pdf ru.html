@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Резюме - Кузнецов Владлен</title>
+            <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.4;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20mm;
+            background: white;
+            font-size: 11pt;
+        }
+
+        @media print {
+            body {
+                padding: 9mm; /* Уменьшено с 10mm */
+                font-size: 9pt; /* Уменьшено с 9.5pt */
+                line-height: 1.18; /* Уменьшено с 1.2 */
+                max-width: 100%;
+            }
+            a {
+                color: #000 !important;
+                text-decoration: none !important;
+            }
+            a[href^="mailto:"]::after,
+            a[href*="linkedin.com"]::after,
+            a[href*="t.me"]::after,
+            a[href*="github.com"]::after,
+            .no-print-url::after {
+                content: "" !important;
+            }
+
+            @page {
+                margin: 9mm; /* Уменьшено с 10mm */
+                size: A4 portrait;
+
+                @top-left { content: ""; }
+                @top-center { content: ""; }
+                @top-right { content: ""; }
+                @bottom-left { content: ""; }
+                @bottom-center { content: ""; }
+                @bottom-right { content: ""; }
+            }
+
+            .header {
+                margin-bottom: 12px; /* Уменьшено с 15px */
+                padding-bottom: 4px; /* Уменьшено с 6px */
+            }
+            .header h1 {
+                font-size: 14.5pt; /* Уменьшено с 15pt */
+                margin-bottom: 2px; /* Уменьшено с 3px */
+            }
+            .header .subtitle {
+                font-size: 10.5pt; /* Уменьшено с 11pt */
+                margin-bottom: 4px; /* Уменьшено с 6px */
+            }
+            .contact-info {
+                font-size: 8pt; /* Уменьшено с 8.5pt */
+                line-height: 1.25; /* Уменьшено с 1.3 */
+            }
+
+            .section {
+                margin-bottom: 8px; /* Уменьшено с 10px */
+            }
+            .section h2 {
+                font-size: 10.5pt; /* Уменьшено с 11.5pt */
+                padding-bottom: 1px;
+                margin-bottom: 3px; /* Уменьшено с 4px */
+            }
+
+            .summary {
+                font-size: 9pt; /* Согласовано с body */
+                line-height: 1.18; /* Согласовано с body */
+                margin-bottom: 1px; /* Уменьшено с 2px */
+            }
+
+            .key-points { margin-bottom: 5px; /* Уменьшено с 8px */ }
+            .key-point {
+                margin-bottom: 1px; /* Уменьшено с 2px */
+                font-size: 8.5pt; /* Уменьшено с 9pt */
+                line-height: 1.15;
+            }
+
+            .job {
+                margin-bottom: 6px; /* Уменьшено с 8px */
+            }
+            .job-header { margin-bottom: 1px; }
+            .job-title { font-size: 10pt; /* Уменьшено с 10.5pt */ }
+            .job-period { font-size: 8pt; /* Уменьшено с 8.5pt */ }
+            .job-company { font-size: 8pt; margin-bottom: 1px; /* Уменьшено с 2px */ }
+            .job ul li {
+                margin-bottom: 1px;
+                font-size: 8.5pt; /* Уменьшено с 9pt */
+                line-height: 1.15;
+            }
+
+            .skills-grid {
+                gap: 8px; /* Уменьшено с 10px */
+            }
+            .skills-category { margin-bottom: 2px; /* Уменьшено с 4px */ }
+            .skills-category-title { font-size: 8.5pt; margin-bottom: 1px; }
+            .skills-list { font-size: 8pt; line-height: 1.15; } /* Уменьшено с 8.5pt, line-height с 1.2 */
+
+            .language-item p { font-size: 8.5pt; line-height: 1.15; margin-bottom: 0px; }
+            .publication-item { font-size: 8pt; line-height: 1.15;}
+
+            .skills-grid h2 { /* Заголовки внутри grid, как "Языки", "Публикации" */
+                font-size: 10.5pt; /* Как и другие .section h2 для печати */
+                padding-bottom: 1px;
+                margin-bottom: 2px; /* Чуть меньше отступ под ними */
+            }
+            .skills-grid h2[style*="margin-top"] {
+                 margin-top: 4px !important; /* Уменьшено с 6px */
+            }
+
+
+        } /* Конец @media print */
+
+
+        /* Общие стили, которые влияют и на просмотр, и на печать, если не переопределены в @media print */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #2c3e50;
+        }
+
+        .header h1 {
+            /* font-size: 26pt;  Было изначально */
+            font-size: 15pt; /* Изменено тобой для просмотра тоже */
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            letter-spacing: 1px;
+        }
+
+        .header .subtitle {
+            /* font-size: 14pt; Было изначально */
+            font-size: 11pt; /* Изменено тобой для просмотра тоже */
+            color: #7f8c8d;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .contact-info {
+            font-size: 8.5pt;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .contact-info a {
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            font-size: 13pt;
+            font-weight: bold;
+            color: #2c3e50;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 12px;
+        }
+
+        .summary {
+            text-align: justify;
+            font-size: 11pt;
+            line-height: 1.5;
+            margin-bottom: 5px;
+        }
+
+        .key-points {
+            margin-bottom: 15px;
+        }
+
+        .key-point {
+            margin-bottom: 6px;
+            position: relative;
+            padding-left: 15px;
+            font-size: 10pt;
+        }
+
+        .key-point:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .job {
+            margin-bottom: 15px;
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 4px;
+        }
+
+        .job-title {
+            font-weight: bold;
+            font-size: 12pt;
+            color: #2c3e50;
+        }
+
+        .job-period {
+            font-size: 10pt;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .job-company {
+            font-size: 10pt;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .job ul {
+            list-style: none;
+            font-size: 10pt;
+            line-height: 1.4;
+            padding-left: 0;
+        }
+
+        .job ul li {
+            margin-bottom: 4px;
+            position: relative;
+            padding-left: 12px;
+        }
+
+        .job ul li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .skills-category {
+            margin-bottom: 12px;
+        }
+
+        .skills-category-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 10pt;
+        }
+
+        .skills-list {
+            font-size: 10pt;
+            line-height: 1.4;
+        }
+
+        .publication-item, .language-item {
+            font-size: 10pt;
+            line-height: 1.4;
+        }
+        .language-item p {
+            margin-bottom: 2px;
+        }
+
+
+        .publication-item a {
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        .publication-item a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>КУЗНЕЦОВ ВЛАДЛЕН</h1>
+        <p class="subtitle">QA Lead | QA Automation | QA Engineer</p>
+        <div class="contact-info">
+            <p>
+                Вьетнам |
+                <a href="mailto:kuznetcov.vladlen@gmail.com">kuznetcov.vladlen@gmail.com</a> |
+                <a href="https://www.linkedin.com/in/vladlen-kuznetcov/" target="_blank">LinkedIn: vladlen-kuznetcov</a> |
+                <a href="https://t.me/Kuznetcov_Vladlen" target="_blank">Telegram: @Kuznetcov_Vladlen</a> |
+                <a href="https://github.com/qa-vlad" target="_blank">GitHub: qa-vlad</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Профессиональное резюме</h2>
+        <p class="summary">
+            QA Lead с <strong>4+ годами опыта</strong>, успешно выстраивающий процессы и обеспечивающий высокое качество продуктов. Обнаружил и локализовал <strong>более 3000 дефектов</strong>. Запустил автоматизацию тестирования с нуля, разрабатываю QA тулзы, занимаюсь менторингом QA-команды.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Ключевые достижения</h2>
+        <div class="key-points">
+            <div class="key-point">Успешно запустил и развиваю проект по автоматизации тестирования с нуля</div>
+            <div class="key-point">Повысил эффективность QA-процессов за счет разработки <span class="highlight">кастомных инструментов</span> конвертации и анализа логов</div>
+            <div class="key-point">Внес ключевой вклад в поддержание высокого рейтинга (<span class="highlight">4.6+/5</span>) продукта в сторах</div>
+            <div class="key-point">Построил эффективную систему найма и развития QA-специалистов в команде</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Опыт работы</h2>
+
+        <div class="job">
+            <div class="job-header">
+                <div class="job-title">QA Lead</div>
+                <div class="job-period">май 2024 — настоящее время</div>
+            </div>
+            <div class="job-company">Gammister | ОАЭ (удаленно)</div>
+            <ul>
+                <li>Инициировал и руковожу проектом автоматизации тестирования (Python, AltTester, Pytest, Allure) с применением ООП</li>
+                <li>Обнаружил <strong>2000+ дефектов</strong>, включая 200+ критических и 400+ высокоприоритетных</li>
+                <li>Разработал конвертер и анализатор логов для упрощения тестирования</li>
+                <li>Внедрил систему найма QA-специалистов; провожу собеседования и менторю QA</li>
+            </ul>
+        </div>
+
+        <div class="job">
+            <div class="job-header">
+                <div class="job-title">QA Engineer</div>
+                <div class="job-period">авг 2022 — май 2024</div>
+            </div>
+            <div class="job-company">Gammister | ОАЭ (удаленно)</div>
+            <ul>
+                <li>Единственный QA в команде: полный цикл ручного тестирования, заложение основ автоматизации (Python, AirTest)</li>
+                <li>Обеспечил стабильный рейтинг продукта 4.6+ в App Store/Google Play</li>
+                <li>Инициировал внедрение 15+ внутриигровых инструментов, ускоривших тестирование</li>
+                <li>Внедрил стандарты баг-репортов и тестовой документации; оптимизировал процессы в Jira</li>
+            </ul>
+        </div>
+
+        <div class="job">
+            <div class="job-header">
+                <div class="job-title">QA Engineer</div>
+                <div class="job-period">окт 2021 — авг 2022</div>
+            </div>
+            <div class="job-company">Cats Who Play | Москва</div>
+            <ul>
+                <li>Тестирование коммерчески успешной игры по всемирно известной франшизе (единственный QA на проекте)</li>
+                <li>Обнаружил и локализовал <strong>850+ уникальных дефектов</strong> за 11 месяцев</li>
+                <li>Разработал скрипты автоматизации тестирования уровней на внутреннем движке компании</li>
+                <li>Создал англоязычную AI-озвучку диалогов для презентации инвесторам</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="skills-grid">
+            <div>
+                <h2>Технические навыки</h2>
+                <div class="skills-category">
+                    <div class="skills-category-title">Автоматизация:</div>
+                    <div class="skills-list">Python, Pytest, Selenium, AltTester, AirTest</div>
+                </div>
+                <div class="skills-category">
+                    <div class="skills-category-title">Инструменты:</div>
+                    <div class="skills-list">Jira, Git, Postman, Allure, Jenkins, ADB, Android Studio, Xcode</div>
+                </div>
+                <div class="skills-category">
+                    <div class="skills-category-title">Другое:</div>
+                    <div class="skills-list">SQL, REST API, JMeter, CI/CD, Browserstack</div>
+                </div>
+            </div>
+            <div>
+                <h2>Языки</h2>
+                <div class="language-item">
+                    <p><strong>Русский</strong> — родной</p>
+                    <p><strong>Английский</strong> — B1</p>
+                    <p><strong>Вьетнамский</strong> — A2</p>
+                </div>
+
+                <h2 style="margin-top: 15px;">Публикации</h2>
+                <div class="publication-item">
+                    <p><a href="https://habr.com/ru/articles/908842" target="_blank" class="no-print-url">"Как я ускорил анализ логов в мобильной игре с помощью Python-конвертера"</a> — Habr</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

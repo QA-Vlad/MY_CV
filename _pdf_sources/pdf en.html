@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume - Kuznetsov Vladlen</title>
+            <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.4;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20mm;
+            background: white;
+            font-size: 11pt;
+        }
+
+        @media print {
+            body {
+                padding: 9mm;
+                font-size: 9pt;
+                line-height: 1.18;
+                max-width: 100%;
+            }
+            a {
+                color: #000 !important;
+                text-decoration: none !important;
+            }
+            a[href^="mailto:"]::after,
+            a[href*="linkedin.com"]::after,
+            a[href*="t.me"]::after, /* Kept for consistency, though t.me link is removed from content */
+            a[href*="github.com"]::after,
+            .no-print-url::after {
+                content: "" !important;
+            }
+
+            @page {
+                margin: 9mm;
+                size: A4 portrait;
+
+                @top-left { content: ""; }
+                @top-center { content: ""; }
+                @top-right { content: ""; }
+                @bottom-left { content: ""; }
+                @bottom-center { content: ""; }
+                @bottom-right { content: ""; }
+            }
+
+            .header {
+                margin-bottom: 12px;
+                padding-bottom: 4px;
+            }
+            .header h1 {
+                font-size: 14.5pt;
+                margin-bottom: 2px;
+            }
+            .header .subtitle {
+                font-size: 10.5pt;
+                margin-bottom: 4px;
+            }
+            .contact-info {
+                font-size: 8pt;
+                line-height: 1.25;
+            }
+
+            .section {
+                margin-bottom: 8px;
+            }
+            .section h2 {
+                font-size: 10.5pt;
+                padding-bottom: 1px;
+                margin-bottom: 3px;
+            }
+
+            .summary {
+                font-size: 9pt;
+                line-height: 1.18;
+                margin-bottom: 1px;
+            }
+
+            .key-points { margin-bottom: 5px;  }
+            .key-point {
+                margin-bottom: 1px;
+                font-size: 8.5pt;
+                line-height: 1.15;
+            }
+
+            .job {
+                margin-bottom: 6px;
+            }
+            .job-header { margin-bottom: 1px; }
+            .job-title { font-size: 10pt;  }
+            .job-period { font-size: 8pt;  }
+            .job-company { font-size: 8pt; margin-bottom: 1px;  }
+            .job ul li {
+                margin-bottom: 1px;
+                font-size: 8.5pt;
+                line-height: 1.15;
+            }
+
+            .skills-grid {
+                gap: 8px;
+            }
+            .skills-category { margin-bottom: 2px;  }
+            .skills-category-title { font-size: 8.5pt; margin-bottom: 1px; }
+            .skills-list { font-size: 8pt; line-height: 1.15; }
+
+            .language-item p { font-size: 8.5pt; line-height: 1.15; margin-bottom: 0px; }
+            .publication-item { font-size: 8pt; line-height: 1.15;}
+
+            .skills-grid h2 {
+                font-size: 10.5pt;
+                padding-bottom: 1px;
+                margin-bottom: 2px;
+            }
+            .skills-grid h2[style*="margin-top"] {
+                 margin-top: 4px !important;
+            }
+
+        } /* Конец @media print */
+
+
+        /* Общие стили, которые влияют и на просмотр, и на печать, если не переопределены в @media print */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #2c3e50;
+        }
+
+        .header h1 {
+            font-size: 15pt;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            letter-spacing: 1px;
+        }
+
+        .header .subtitle {
+            font-size: 11pt;
+            color: #7f8c8d;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .contact-info {
+            font-size: 8.5pt;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .contact-info a {
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            font-size: 13pt;
+            font-weight: bold;
+            color: #2c3e50;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 12px;
+        }
+
+        .summary {
+            text-align: justify;
+            font-size: 11pt;
+            line-height: 1.5;
+            margin-bottom: 5px;
+        }
+
+        .key-points {
+            margin-bottom: 15px;
+        }
+
+        .key-point {
+            margin-bottom: 6px;
+            position: relative;
+            padding-left: 15px;
+            font-size: 10pt;
+        }
+
+        .key-point:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .job {
+            margin-bottom: 15px;
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 4px;
+        }
+
+        .job-title {
+            font-weight: bold;
+            font-size: 12pt;
+            color: #2c3e50;
+        }
+
+        .job-period {
+            font-size: 10pt;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .job-company {
+            font-size: 10pt;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .job ul {
+            list-style: none;
+            font-size: 10pt;
+            line-height: 1.4;
+            padding-left: 0;
+        }
+
+        .job ul li {
+            margin-bottom: 4px;
+            position: relative;
+            padding-left: 12px;
+        }
+
+        .job ul li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .skills-category {
+            margin-bottom: 12px;
+        }
+
+        .skills-category-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 10pt;
+        }
+
+        .skills-list {
+            font-size: 10pt;
+            line-height: 1.4;
+        }
+
+        .publication-item, .language-item {
+            font-size: 10pt;
+            line-height: 1.4;
+        }
+        .language-item p {
+            margin-bottom: 2px;
+        }
+
+
+        .publication-item a {
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        .publication-item a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>KUZNETSOV VLADLEN</h1>
+        <p class="subtitle">QA Lead | QA Automation | QA Engineer</p>
+        <div class="contact-info">
+            <p>
+                Vietnam |
+                <a href="mailto:kuznetcov.vladlen@gmail.com">kuznetcov.vladlen@gmail.com</a> |
+                <a href="https://www.linkedin.com/in/vladlen-kuznetcov/" target="_blank">LinkedIn: vladlen-kuznetcov</a> |
+                <a href="https://github.com/qa-vlad" target="_blank">GitHub: qa-vlad</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Professional Summary</h2>
+        <p class="summary">
+            QA Lead with <strong>4+ years of experience</strong>, successfully building processes and ensuring high product quality. Identified and localized <strong>over 3000 defects</strong>. Launched test automation from scratch, develop QA tools, and mentor the QA team.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Key Achievements</h2>
+        <div class="key-points">
+            <div class="key-point">Successfully launched and developing a test automation project from scratch.</div>
+            <div class="key-point">Increased QA process efficiency by developing <span class="highlight">custom tools</span> for log conversion and analysis.</div>
+            <div class="key-point">Made a key contribution to maintaining a high product rating (<span class="highlight">4.6+/5</span>) in app stores.</div>
+            <div class="key-point">Built an effective system for hiring and developing QA specialists within the team.</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Work Experience</h2>
+
+        <div class="job">
+            <div class="job-header">
+                <div class="job-title">QA Lead</div>
+                <div class="job-period">May 2024 — Present</div>
+            </div>
+            <div class="job-company">Gammister | UAE (Remote)</div>
+            <ul>
+                <li>Initiated and leading a test automation project (Python, AltTester, Pytest, Allure) using OOP principles.</li>
+                <li>Identified <strong>2000+ defects</strong>, including 200+ critical and 400+ high-priority ones.</li>
+                <li>Developed a log converter and analyzer to simplify testing.</li>
+                <li>Implemented a QA specialist hiring system; conduct interviews and mentor QA staff.</li>
+            </ul>
+        </div>
+
+        <div class="job">
+            <div class="job-header">
+                <div class="job-title">QA Engineer</div>
+                <div class="job-period">Aug 2022 — May 2024</div>
+            </div>
+            <div class="job-company">Gammister | UAE (Remote)</div>
+            <ul>
+                <li>Sole QA in the team: full manual testing cycle, laying the groundwork for automation (Python, AirTest).</li>
+                <li>Ensured a stable product rating of 4.6+ in the App Store/Google Play.</li>
+                <li>Initiated the implementation of 15+ in-game tools that accelerated testing.</li>
+                <li>Implemented bug report and test documentation standards; optimized Jira processes.</li>
+            </ul>
+        </div>
+
+        <div class="job">
+            <div class="job-header">
+                <div class="job-title">QA Engineer</div>
+                <div class="job-period">Oct 2021 — Aug 2022</div>
+            </div>
+            <div class="job-company">Cats Who Play | Moscow</div>
+            <ul>
+                <li>Tested a commercially successful game based on a world-renowned franchise (sole QA on the project).</li>
+                <li>Identified and localized <strong>850+ unique defects</strong> in 11 months.</li>
+                <li>Developed level test automation scripts on the company's internal engine.</li>
+                <li>Created English AI-powered voiceovers for dialogues for investor presentations.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="skills-grid">
+            <div>
+                <h2>Technical Skills</h2>
+                <div class="skills-category">
+                    <div class="skills-category-title">Automation:</div>
+                    <div class="skills-list">Python, Pytest, Selenium, AltTester, AirTest</div>
+                </div>
+                <div class="skills-category">
+                    <div class="skills-category-title">Tools:</div>
+                    <div class="skills-list">Jira, Git, Postman, Allure, Jenkins, ADB, Android Studio, Xcode</div>
+                </div>
+                <div class="skills-category">
+                    <div class="skills-category-title">Other:</div>
+                    <div class="skills-list">SQL, REST API, JMeter, CI/CD, Browserstack</div>
+                </div>
+            </div>
+            <div>
+                <h2>Languages</h2>
+                <div class="language-item">
+                    <p><strong>Russian</strong> — Native</p>
+                    <p><strong>English</strong> — B1</p>
+                    <p><strong>Vietnamese</strong> — A2</p>
+                </div>
+
+                <h2 style="margin-top: 15px;">Publications</h2>
+                <div class="publication-item">
+                    <p><a href="https://habr.com/ru/articles/908842" target="_blank" class="no-print-url">"How I Accelerated Mobile Game Log Analysis with a Python Converter"</a> — Habr</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -266,7 +266,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     const downloadPdfButton = document.getElementById('download-pdf-button');
     if (downloadPdfButton) {
         downloadPdfButton.addEventListener('click', () => {
-            window.print();
+            // *** НАЧАЛО ИЗМЕНЕНИЙ ДЛЯ СКАЧИВАНИЯ PDF ***
+            let fileName = '';
+            if (currentLang === 'ru') {
+                fileName = 'Резюме - Кузнецов Владлен.pdf';
+            } else { // Предполагаем, что другой язык - 'en'
+                fileName = 'Resume - Kuznetsov Vladlen.pdf';
+            }
+
+            // Путь к файлам PDF внутри папки /pdf/ относительно корня сайта
+            // basePath уже содержит начальный слэш, если он есть (например, /MY_CV)
+            const filePath = `${basePath}/pdf/${fileName}`;
+
+            const link = document.createElement('a');
+            link.href = filePath;
+            link.download = fileName; // Атрибут download указывает имя файла при сохранении
+            document.body.appendChild(link); // Ссылка должна быть в DOM для клика в некоторых браузерах
+            link.click();
+            document.body.removeChild(link); // Удаляем ссылку после клика
+            // *** КОНЕЦ ИЗМЕНЕНИЙ ДЛЯ СКАЧИВАНИЯ PDF ***
         });
     }
 
