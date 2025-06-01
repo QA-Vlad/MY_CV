@@ -2,27 +2,71 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>CV Владлен Кузнецов - Перенаправление...</title> <!-- Переведено -->
+    <title>CV Vladlen Kuznetsov - Redirecting...</title>
     <script type="text/javascript">
-      // Сегмент скрипта для spa-github-pages для перенаправления на index.html
-      // и сохранения предполагаемого пути в sessionStorage.
-      // Нужно настроить segmentCount в соответствии со структурой репозитория.
-      // Для сайта проекта (username.github.io/repoName/), segmentCount равен 1.
-      var segmentCount = 1;
+      // spa-github-pages-script
+      // https://github.com/rafgraph/spa-github-pages
+      // Copyright (c) 2016 Rafael Pedicini, licensed under the MIT License
+      // Version with modifications for passing path via URL parameter
+
+      var segmentCount = 1; // Adjust as needed (1 for username.github.io/repoName)
 
       var l = window.location;
-      // Рассчитываем базовый путь для перенаправления (например, /MY_CV/)
-      var homePath = l.pathname.split('/').slice(0, 1 + segmentCount).join('/') +
-                     (l.pathname.endsWith('/') && l.pathname.split('/').slice(0, 1 + segmentCount).join('/').length === l.pathname.length -1 ? '' : '/');
 
-      // Извлекаем сегмент пути после имени репозитория (например, "en" или "ru?param=1")
-      var targetPath = l.pathname.slice(1).split('/').slice(segmentCount).join('/') + l.search + l.hash;
+      // Calculate the base path for redirection (e.g., /MY_CV/)
+      // Ensures homePath ends with a slash if it's not the root.
+      var homePathSegments = l.pathname.split('/').slice(0, 1 + segmentCount);
+      var homePath = homePathSegments.join('/');
+      if (homePathSegments.length > 1 && homePathSegments[homePathSegments.length - 1] !== '') {
+          homePath += '/';
+      } else if (homePathSegments.length === 1 && homePath === '') { // Root case like username.github.io
+          homePath = '/';
+      }
 
-      sessionStorage.redirect = targetPath; // Сохраняем целевой путь
-      l.replace(homePath); // Перенаправляем на homePath (например, /MY_CV/index.html или /MY_CV/)
+
+      // Extract the path segment after the repository name (e.g., "en/" or "ru?param=1")
+      // We want the part that was originally requested and caused the 404.
+      var fullPath = l.pathname; // e.g., /MY_CV/en/ or /MY_CV/some/other/path
+      var basePathForSlice = l.pathname.split('/').slice(0, 1 + segmentCount).join('/'); // e.g., /MY_CV
+
+      var spaRedirectPath = '';
+      if (fullPath.length > basePathForSlice.length) {
+        spaRedirectPath = fullPath.substring(basePathForSlice.length + (basePathForSlice.endsWith('/') ? 0 : 1) );
+      }
+
+      // Preserve search and hash
+      var spaRedirectSearch = l.search;
+      var spaRedirectHash = l.hash;
+
+      var redirectUrl = homePath; // This will be like /MY_CV/ (pointing to index.html)
+
+      if (spaRedirectPath) {
+        redirectUrl += '?spa_path=' + encodeURIComponent(spaRedirectPath);
+        redirectUrl += spaRedirectSearch; // Append original search params
+      } else {
+        // If no spaRedirectPath, just append original search and hash to homePath
+        redirectUrl += spaRedirectSearch;
+      }
+      redirectUrl += spaRedirectHash; // Always append original hash
+
+      l.replace(redirectUrl);
+
     </script>
   </head>
   <body>
-    Если вас не перенаправило автоматически, пожалуйста, <a href="/MY_CV/">нажмите здесь</a>.
+    If you are not redirected automatically, please <a id="redirect-link" href="/MY_CV/">click here</a>.
+    <script type="text/javascript">
+      // Update the fallback link href just in case js in head didn't run as expected for some reason
+      // (though it should have already redirected)
+      var lForLink = window.location;
+      var homePathForLinkSegments = lForLink.pathname.split('/').slice(0, 1 + 1); // segmentCount is 1
+      var homePathForLink = homePathForLinkSegments.join('/');
+      if (homePathForLinkSegments.length > 1 && homePathForLinkSegments[homePathForLinkSegments.length - 1] !== '') {
+          homePathForLink += '/';
+      } else if (homePathForLinkSegments.length === 1 && homePathForLink === '') {
+          homePathForLink = '/';
+      }
+      document.getElementById('redirect-link').href = homePathForLink;
+    </script>
   </body>
 </html>

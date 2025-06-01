@@ -1,63 +1,87 @@
 // --- НАЧАЛО ФАЙЛА scripts.js ---
 
-// Самовызывающаяся функция для обработки перенаправления с 404.html
-(function () {
-  var redirect = sessionStorage.redirect;
-  delete sessionStorage.redirect;
-  if (redirect && redirect !== '' && redirect !== '/') {
-    var l = window.location;
-    var newRedirectPath = redirect.startsWith('/') ? redirect.substring(1) : redirect;
-    // Убедимся, что basePath заканчивается на слеш, если он не корень
-    var adjustedBasePath = (l.pathname.endsWith('/') ? l.pathname : l.pathname.substring(0, l.pathname.lastIndexOf('/') + 1));
-    // Если redirect содержит параметры или хеш, они будут добавлены.
-    // Для простого пути типа "en", newFullPath будет basePath + "en"
-    var newFullPath = adjustedBasePath + newRedirectPath;
-
-    // Проверка, если basePath сам по себе уже /MY_CV/en/ или /MY_CV/ru/
-    // и redirect это пустая строка (случай прямого захода на /MY_CV/en/ который вызвал 404)
-    // В этом случае newFullPath уже должен быть правильным.
-
-    // Если же l.pathname был /MY_CV/ (после редиректа с 404.html на homePath)
-    // и redirect был 'en' или 'ru', то newFullPath будет /MY_CV/en или /MY_CV/ru
-    // Нам нужно добавить слеш, если его нет и это языковая директория
-    if (newRedirectPath === 'en' || newRedirectPath === 'ru') {
-        if (!newFullPath.endsWith('/')) {
-            newFullPath += '/';
-        }
-    }
-
-    history.replaceState(null, '', newFullPath);
-  }
-})();
-
-
 let currentLang = 'ru';
 let loadedTranslations = {};
 const toggleButton = document.getElementById('language-toggle');
 const basePath = '/MY_CV';
 
+// --- Начало initializeApp и других функций, которые НЕ меняются в этом исправлении ---
+// (Берем их из моего предыдущего ответа, где была введена initializeApp)
+
+async function initializeApp() {
+    if (!document.body.classList.contains('loading-translations')) {
+        document.body.classList.add('loading-translations');
+    }
+
+    let langToLoad = 'ru';
+    let performPushStateInChangeLanguage = true;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const spaPathFromParam = urlParams.get('spa_path');
+
+    if (spaPathFromParam) {
+        urlParams.delete('spa_path');
+        let cleanSearch = urlParams.toString();
+        if (cleanSearch) cleanSearch = '?' + cleanSearch;
+
+        let langSegment = spaPathFromParam.replace(/\/$/, "").split('/')[0];
+        if (langSegment === 'en' || langSegment === 'ru') {
+            langToLoad = langSegment;
+        }
+
+        const newHistoryPath = `${basePath}/${langToLoad}/${cleanSearch}${window.location.hash}`;
+        history.replaceState({ lang: langToLoad }, document.title, newHistoryPath);
+        performPushStateInChangeLanguage = false;
+    } else {
+        const path = window.location.pathname;
+        const langPathRegex = new RegExp(`^${basePath}/(ru|en)/?$`);
+        const match = path.match(langPathRegex);
+
+        if (match && match[1]) {
+            langToLoad = match[1];
+            const expectedPathWithSlash = `${basePath}/${langToLoad}/`;
+            if (window.location.pathname !== expectedPathWithSlash) {
+                history.replaceState({ lang: langToLoad }, document.title, `${expectedPathWithSlash}${window.location.search}${window.location.hash}`);
+            }
+            performPushStateInChangeLanguage = false;
+        } else if (path === basePath || path === basePath + '/' || path.endsWith('/index.html')) {
+            langToLoad = 'ru';
+            const defaultLangPath = `${basePath}/${langToLoad}/${window.location.search}${window.location.hash}`;
+            history.replaceState({ lang: langToLoad }, document.title, defaultLangPath);
+            performPushStateInChangeLanguage = false;
+        }
+    }
+
+    currentLang = langToLoad;
+    await changeLanguage(currentLang, performPushStateInChangeLanguage);
+}
+
+
 async function fetchTranslations(lang) {
     try {
         const response = await fetch(`${basePath}/translations/${lang}.json?v=${new Date().getTime()}`);
         if (!response.ok) {
-            console.error(`Не удалось загрузить ${lang}.json. Статус: ${response.status}`);
-            if (lang !== 'ru') {
-                console.warn(`Выполняется откат на 'ru' с языка '${lang}'`);
-                currentLang = 'ru';
-                return await fetchTranslations('ru');
+            console.error(`Failed to load ${lang}.json. Status: ${response.status}`);
+            let fallbackLang = 'ru';
+            if (lang === 'ru') { // Если уже пытались загрузить 'ru' и не вышло
+                 console.error("Critical error: Default language 'ru' also failed to load.");
+                 return {}; // Возвращаем пустой объект, чтобы избежать бесконечной рекурсии
             }
-            return {};
+            console.warn(`Falling back to '${fallbackLang}' from language '${lang}'`);
+            // currentLang будет обновлен в changeLanguage
+            return await fetchTranslations(fallbackLang);
         }
-        currentLang = lang;
+        // Не меняем currentLang здесь, это делает changeLanguage
         return await response.json();
     } catch (error) {
-        console.error(`Ошибка при загрузке переводов для ${lang}:`, error);
-        if (lang !== 'ru') {
-            console.warn(`Выполняется откат на 'ru' с языка '${lang}' из-за ошибки.`);
-            currentLang = 'ru';
-            return await fetchTranslations('ru');
+        console.error(`Error loading translations for ${lang}:`, error);
+        let fallbackLang = 'ru';
+        if (lang === 'ru') {
+             console.error("Critical error: Default language 'ru' also failed to load on error.");
+             return {};
         }
-        return {};
+        console.warn(`Falling back to '${fallbackLang}' from language '${lang}' due to error.`);
+        return await fetchTranslations(fallbackLang);
     }
 }
 
@@ -66,164 +90,161 @@ function updateMetaTagsForSEO() {
     head.querySelectorAll('link[rel="alternate"][hreflang], link[rel="canonical"]').forEach(tag => tag.remove());
 
     const siteOrigin = window.location.origin;
-    const ruUrl = `${siteOrigin}${basePath}/ru/`; // Слеш добавлен
-    const enUrl = `${siteOrigin}${basePath}/en/`; // Слеш добавлен
+    const ruUrl = `${siteOrigin}${basePath}/ru/`;
+    const enUrl = `${siteOrigin}${basePath}/en/`;
     const defaultUrl = ruUrl;
 
-    let canonicalUrl = '';
-    if (currentLang === 'ru') {
-        canonicalUrl = ruUrl;
-    } else {
-        canonicalUrl = enUrl;
-    }
+    let canonicalUrl = (currentLang === 'ru') ? ruUrl : enUrl;
 
     const canonicalTag = document.createElement('link');
     canonicalTag.setAttribute('rel', 'canonical');
     canonicalTag.setAttribute('href', canonicalUrl);
     head.appendChild(canonicalTag);
 
-    const hreflangRuTag = document.createElement('link');
-    hreflangRuTag.setAttribute('rel', 'alternate');
-    hreflangRuTag.setAttribute('hreflang', 'ru');
-    hreflangRuTag.setAttribute('href', ruUrl);
-    head.appendChild(hreflangRuTag);
-
-    const hreflangEnTag = document.createElement('link');
-    hreflangEnTag.setAttribute('rel', 'alternate');
-    hreflangEnTag.setAttribute('hreflang', 'en');
-    hreflangEnTag.setAttribute('href', enUrl);
-    head.appendChild(hreflangEnTag);
-
-    const hreflangXDefaultTag = document.createElement('link');
-    hreflangXDefaultTag.setAttribute('rel', 'alternate');
-    hreflangXDefaultTag.setAttribute('hreflang', 'x-default');
-    hreflangXDefaultTag.setAttribute('href', defaultUrl);
-    head.appendChild(hreflangXDefaultTag);
+    ['ru', 'en', 'x-default'].forEach(langCode => { // изменил lang на langCode во избежание путаницы с currentLang
+        const tag = document.createElement('link');
+        tag.setAttribute('rel', 'alternate');
+        tag.setAttribute('hreflang', langCode);
+        tag.setAttribute('href', langCode === 'en' ? enUrl : (langCode === 'ru' ? ruUrl : defaultUrl) );
+        head.appendChild(tag);
+    });
 }
 
 function applyTranslations() {
     try {
-        if (Object.keys(loadedTranslations).length === 0) {
-            console.warn("Переводы не загружены или пусты. Отображение с настройками по умолчанию.");
-            document.title = document.title || 'CV Vladlen Kuznetsov';
-            if (toggleButton) {
-                const defaultButtonText = currentLang === 'ru' ? 'EN' : 'RU';
-                toggleButton.textContent = loadedTranslations['lang-toggle-text'] || defaultButtonText;
-            }
-            const downloadPdfButton = document.getElementById('download-pdf-button');
-            if (downloadPdfButton) {
-                 const defaultPdfButtonText = currentLang === 'ru' ? 'Скачать PDF' : 'Download PDF';
-                 downloadPdfButton.textContent = loadedTranslations['download-pdf-button-text'] || defaultPdfButtonText;
-            }
-            updateWorkDuration();
-            const ogUrlMeta = document.querySelector('meta[property="og:url"]');
-            if (ogUrlMeta) {
-                 ogUrlMeta.content = `${window.location.origin}${basePath}/${currentLang}/`; // Слеш добавлен
-            }
-            return;
+        const translationsAvailable = Object.keys(loadedTranslations).length > 0;
+
+        document.documentElement.lang = translationsAvailable ? (loadedTranslations['lang-code'] || currentLang) : currentLang;
+        document.title = translationsAvailable ? (loadedTranslations['page-title'] || 'CV Vladlen Kuznetsov') : 'CV Vladlen Kuznetsov';
+
+        if (translationsAvailable) {
+            const metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) metaDesc.content = loadedTranslations['meta-description'] || '';
+            const metaKeywords = document.querySelector('meta[name="keywords"]');
+            if (metaKeywords) metaKeywords.content = loadedTranslations['meta-keywords'] || '';
+            const ogTitle = document.querySelector('meta[property="og:title"]');
+            if (ogTitle) ogTitle.content = loadedTranslations['og-title'] || '';
+            const ogDesc = document.querySelector('meta[property="og:description"]');
+            if (ogDesc) ogDesc.content = loadedTranslations['og-description'] || '';
         }
-
-        document.documentElement.lang = loadedTranslations['lang-code'] || currentLang;
-        document.title = loadedTranslations['page-title'] || 'CV Vladlen Kuznetsov';
-
-        const metaDesc = document.querySelector('meta[name="description"]');
-        if (metaDesc) metaDesc.content = loadedTranslations['meta-description'] || '';
-        const metaKeywords = document.querySelector('meta[name="keywords"]');
-        if (metaKeywords) metaKeywords.content = loadedTranslations['meta-keywords'] || '';
-        const ogTitle = document.querySelector('meta[property="og:title"]');
-        if (ogTitle) ogTitle.content = loadedTranslations['og-title'] || '';
-        const ogDesc = document.querySelector('meta[property="og:description"]');
-        if (ogDesc) ogDesc.content = loadedTranslations['og-description'] || '';
 
         const ogUrlMeta = document.querySelector('meta[property="og:url"]');
         if (ogUrlMeta) {
-            ogUrlMeta.content = `${window.location.origin}${basePath}/${currentLang}/`; // Слеш добавлен
+            ogUrlMeta.content = `${window.location.origin}${basePath}/${currentLang}/`;
         }
 
         const profilePhoto = document.getElementById('profile-photo');
-        if (profilePhoto) profilePhoto.alt = loadedTranslations['profile-photo-alt'] || 'Profile Photo';
+        if (profilePhoto) profilePhoto.alt = translationsAvailable ? (loadedTranslations['profile-photo-alt'] || 'Profile Photo') : 'Profile Photo';
 
         document.querySelectorAll('[data-lang-key]').forEach(element => {
             const key = element.getAttribute('data-lang-key');
-            if (loadedTranslations[key]) {
-                if (element.tagName === 'BUTTON' && (element.id === 'language-toggle' || element.id === 'download-pdf-button')) {
-                    element.textContent = loadedTranslations[key];
-                } else {
-                    element.innerHTML = loadedTranslations[key];
-                }
+            // Обновляем, только если ключ есть в переводах ИЛИ это не кнопка (для кнопок отдельная логика ниже)
+            if (translationsAvailable && loadedTranslations[key]) {
+                 element.innerHTML = loadedTranslations[key];
+            } else if (!translationsAvailable && element.id !== 'language-toggle' && element.id !== 'download-pdf-button' && !element.closest('#gammister-lead-duration')) {
+                // Если переводов нет, можно либо очистить, либо оставить дефолтный HTML.
+                // Пока оставим как есть, чтобы не стирать то, что уже есть в HTML.
             }
         });
 
         if (toggleButton) {
-            toggleButton.textContent = loadedTranslations['lang-toggle-text'] || (currentLang === 'ru' ? 'EN' : 'RU');
+             toggleButton.textContent = translationsAvailable ? (loadedTranslations['lang-toggle-text'] || (currentLang === 'ru' ? 'EN' : 'RU')) : (currentLang === 'ru' ? 'EN' : 'RU');
         }
         const downloadPdfButton = document.getElementById('download-pdf-button');
-        if (downloadPdfButton && loadedTranslations['download-pdf-button-text']) {
-            downloadPdfButton.textContent = loadedTranslations['download-pdf-button-text'];
+         if (downloadPdfButton) {
+            downloadPdfButton.textContent = translationsAvailable ? (loadedTranslations['download-pdf-button-text'] || (currentLang === 'ru' ? 'Скачать PDF' : 'Download PDF')) : (currentLang === 'ru' ? 'Скачать PDF' : 'Download PDF');
         }
-
-        updateWorkDuration();
+        // updateWorkDuration будет вызван отдельно после applyTranslations
     } finally {
         document.body.classList.remove('loading-translations');
     }
 }
 
-async function changeLanguage(lang) {
+async function changeLanguage(lang, needsHistoryUpdate = true) {
     if (!document.body.classList.contains('loading-translations')) {
         document.body.classList.add('loading-translations');
     }
 
-    loadedTranslations = await fetchTranslations(lang);
+    currentLang = lang;
+
+    let newTranslations = await fetchTranslations(lang); // fetchTranslations может изменить currentLang при ошибке
+    // Убедимся, что currentLang актуален ПОСЛЕ fetchTranslations, если был откат
+    if (Object.keys(newTranslations).length === 0 && lang !== 'ru' && currentLang !== 'ru') {
+        // Это условие маловероятно, если fetchTranslations корректно откатывает currentLang сам,
+        // но на всякий случай.
+        currentLang = 'ru';
+    }
+    loadedTranslations = newTranslations;
+
     applyTranslations();
     updateMetaTagsForSEO();
 
-    const newPath = `${basePath}/${currentLang}/`; // Слеш добавлен
-    const fullNewPath = `${newPath}${window.location.search}${window.location.hash}`;
+    if (needsHistoryUpdate) {
+        const newPath = `${basePath}/${currentLang}/`;
+        const fullNewPath = `${newPath}${window.location.search}${window.location.hash}`;
+        const pageTitleForHistory = document.title;
 
-    const currentPathLangSegment = window.location.pathname.substring(basePath.length + 1).split('/')[0];
-    const pageTitleForHistory = loadedTranslations['page-title'] || document.title;
-
-    // Сверяем текущий URL (window.location.pathname) с тем, что должен быть (newPath)
-    // Убедимся, что и тот и другой заканчиваются на слеш для корректного сравнения
-    const currentPathForComparison = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
-
-    if (currentPathForComparison !== newPath) {
-         history.pushState({ lang: currentLang }, pageTitleForHistory, fullNewPath);
-    } else {
-        history.replaceState({ lang: currentLang }, pageTitleForHistory, window.location.href);
+        const currentPathForComparison = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+        if (currentPathForComparison !== newPath || window.location.search + window.location.hash !== "" ) {
+            history.pushState({ lang: currentLang }, pageTitleForHistory, fullNewPath);
+        } else {
+            history.replaceState({ lang: currentLang }, pageTitleForHistory, fullNewPath);
+        }
     }
+    updateWorkDuration();
 }
+
 
 if (toggleButton) {
     toggleButton.addEventListener('click', () => {
         const newLang = currentLang === 'ru' ? 'en' : 'ru';
-        changeLanguage(newLang);
+        changeLanguage(newLang, true);
     });
 }
+// --- Конец initializeApp и других функций ---
 
+// --- НАЧАЛО ВОССТАНОВЛЕННОЙ updateWorkDuration ---
+// Эта функция взята из вашего предоставленного кода, который работал с sessionStorage,
+// и адаптирована для работы с loadedTranslations и currentLang
 function updateWorkDuration() {
+    // Проверяем, есть ли ключ в переводах, если нет, то используем дефолтную строку
+    // Это условие было в самом начале вашей версии функции
     if (Object.keys(loadedTranslations).length === 0 || !loadedTranslations['qa-lead-duration-full']) {
         const element = document.getElementById('gammister-lead-duration');
-        if(element && element.getAttribute('data-lang-key') === 'qa-lead-duration-full' && !element.textContent.includes('·')) {
-            if (loadedTranslations['qa-lead-duration-full']) {
-                 element.innerHTML = loadedTranslations['qa-lead-duration-full'];
-            } else if (currentLang === 'ru') {
-                element.innerHTML = "май 2024 г. – настоящее время | Gammister | ОАЭ (удаленно)";
-            } else {
-                element.innerHTML = "May 2024 – Present | Gammister | UAE (Remote)";
+        if(element && element.getAttribute('data-lang-key') === 'qa-lead-duration-full') { // && !element.textContent.includes('·') - убрал, т.к. мы всегда будем обновлять
+            // Это условие для самого первого рендера, когда translations еще могут быть не загружены
+            // или если ключ отсутствует
+            let defaultText = "";
+            if (currentLang === 'ru') {
+                defaultText = "май 2024 г. – настоящее время | Gammister | ОАЭ (удаленно)";
+            } else { // en
+                defaultText = "May 2024 – Present | Gammister | UAE (Remote)";
             }
+            // Если ключ есть в переводах, но он пуст, то тоже используем дефолт
+            element.innerHTML = (loadedTranslations && loadedTranslations['qa-lead-duration-full']) ? loadedTranslations['qa-lead-duration-full'] : defaultText;
         }
-        if (!loadedTranslations['qa-lead-duration-full']) return;
+        // Если ключ 'qa-lead-duration-full' отсутствует в loadedTranslations,
+        // то дальнейший код не будет корректно работать, так как baseStringParts будет неверным.
+        // Однако, если он есть, но пустой, то тоже проблема.
+        // Лучше просто выйти, если нет базовой строки для работы.
+        if (!loadedTranslations || !loadedTranslations['qa-lead-duration-full']) return;
     }
 
-    const startDate = new Date('2024-05-25T00:00:00');
+    const startDate = new Date('2024-05-25T00:00:00'); // Убедитесь, что эта дата верна
     const currentDate = new Date();
     const diffInMs = currentDate - startDate;
 
     const element = document.getElementById('gammister-lead-duration');
+    if (!element) return; // Если элемента нет на странице
 
-    if (diffInMs < 0) {
-         if(element && loadedTranslations['qa-lead-duration-full']) element.innerHTML = loadedTranslations['qa-lead-duration-full'];
+    if (diffInMs < 0) { // Если дата начала в будущем
+         if(loadedTranslations['qa-lead-duration-full']) {
+            element.innerHTML = loadedTranslations['qa-lead-duration-full'];
+         } else if (currentLang === 'ru') {
+            element.innerHTML = "май 2024 г. – настоящее время | Gammister | ОАЭ (удаленно)";
+         } else {
+            element.innerHTML = "May 2024 – Present | Gammister | UAE (Remote)";
+         }
          return;
     }
 
@@ -232,113 +253,96 @@ function updateWorkDuration() {
     let totalMinutes = Math.floor(totalSeconds / 60);
     let minutes = totalMinutes % 60;
     let totalHours = Math.floor(totalMinutes / 60);
-    let hours = totalHours % 24;
-    let totalDays = Math.floor(totalHours / 24);
+    let hours = totalHours % 24; // Это часы текущего дня от начала отсчета, а не общие часы
+    // let totalDays = Math.floor(totalHours / 24); // Не используется в этой версии напрямую для строки
 
+    // Логика из вашего работающего кода для годов, месяцев, дней
     let years = 0;
     let months = 0;
-    let tempDays = totalDays;
+    let tempDaysCalc = Math.floor(totalHours / 24); // Используем общее количество дней для расчета
 
-    if (tempDays >= 365.25) {
-        years = Math.floor(tempDays / 365.25);
-        tempDays -= Math.floor(years * 365.25);
+    if (tempDaysCalc >= 365.25) { // Используем 365.25 для учета високосных годов
+        years = Math.floor(tempDaysCalc / 365.25);
+        tempDaysCalc -= Math.floor(years * 365.25);
     }
-    if (tempDays >= 30.4375) {
-        months = Math.floor(tempDays / 30.4375);
-        tempDays -= Math.floor(months * 30.4375);
+    if (tempDaysCalc >= 30.4375) { // Среднее количество дней в месяце
+        months = Math.floor(tempDaysCalc / 30.4375);
+        tempDaysCalc -= Math.floor(months * 30.4375);
     }
-    let days = Math.floor(tempDays);
+    let days = Math.floor(tempDaysCalc);
+
 
     let durationString = '';
-    const yearAbbr = loadedTranslations['year-abbr'] || (currentLang === 'ru' ? 'г.' : 'yr');
-    const monthAbbr = loadedTranslations['month-abbr'] || (currentLang === 'ru' ? 'мес.' : 'mos');
-    const dayAbbr = loadedTranslations['day-abbr'] || (currentLang === 'ru' ? 'дн.' : 'days');
-    const hourAbbr = loadedTranslations['hour-abbr'] || (currentLang === 'ru' ? 'ч.' : 'hrs');
-    const minuteAbbr = loadedTranslations['minute-abbr'] || (currentLang === 'ru' ? 'мин.' : 'min');
-    const secondAbbr = loadedTranslations['second-abbr'] || (currentLang === 'ru' ? 'сек.' : 'sec');
+    // Используем loadedTranslations для аббревиатур, с откатом на дефолт
+    const yearAbbr = (loadedTranslations && loadedTranslations['year-abbr']) || (currentLang === 'ru' ? 'г.' : 'yr');
+    const monthAbbr = (loadedTranslations && loadedTranslations['month-abbr']) || (currentLang === 'ru' ? 'мес.' : 'mos');
+    const dayAbbr = (loadedTranslations && loadedTranslations['day-abbr']) || (currentLang === 'ru' ? 'дн.' : 'days');
+    const hourAbbr = (loadedTranslations && loadedTranslations['hour-abbr']) || (currentLang === 'ru' ? 'ч.' : 'hrs');
+    const minuteAbbr = (loadedTranslations && loadedTranslations['minute-abbr']) || (currentLang === 'ru' ? 'мин.' : 'min');
+    const secondAbbr = (loadedTranslations && loadedTranslations['second-abbr']) || (currentLang === 'ru' ? 'сек.' : 'sec');
 
+    // Формирование строки точно как на вашем скриншоте
     if (years > 0) durationString += `${years} ${yearAbbr} `;
-    if (months > 0 || years > 0) durationString += `${months} ${monthAbbr} `;
-    if (days > 0 || months > 0 || years > 0) durationString += `${days} ${dayAbbr} `;
-    if (hours > 0 || days > 0 || months > 0 || years > 0) durationString += `${hours} ${hourAbbr} `;
-    if (minutes > 0 || hours > 0 || days > 0 || months > 0 || years > 0) durationString += `${minutes} ${minuteAbbr} `;
+    // Месяцы показываем, даже если 0, если есть года (или если это единственный не нулевой компонент до дней)
+    if (years > 0 || months > 0 ) durationString += `${months} ${monthAbbr} `;
+    // Дни показываем, если есть года/месяцы или если это единственный компонент до часов
+    if (years > 0 || months > 0 || days > 0) durationString += `${days} ${dayAbbr} `;
+
+    // Часы (используем `hours` из `totalHours % 24`, так как это часы текущего дня в отсчете)
+    // или можно использовать `totalHours` если нужно общее кол-во часов. На скриншоте это похоже на `totalHours % 24`.
+    // Показываем часы, если это первый день или если есть более крупные единицы
+    if (years > 0 || months > 0 || days > 0 || hours > 0) durationString += `${hours} ${hourAbbr} `;
+
+    // Минуты
+    if (years > 0 || months > 0 || days > 0 || hours > 0 || minutes > 0) durationString += `${minutes} ${minuteAbbr} `;
+
+    // Секунды показываем всегда
     durationString += `${seconds} ${secondAbbr}`;
+
     durationString = durationString.trim();
 
-    if (totalSeconds === 0 && Object.keys(loadedTranslations).length > 0) {
-         durationString = loadedTranslations['duration-just-started'] || (currentLang === 'ru' ? 'только началось' : 'just started');
+    // Текст "только началось"
+    const justStartedText = (loadedTranslations && loadedTranslations['duration-just-started']) || (currentLang === 'ru' ? 'только началось' : 'just started');
+    if (totalSeconds === 0) { // Строго 0 секунд
+         durationString = justStartedText;
     }
 
-    if (element && loadedTranslations['qa-lead-duration-full']) {
-        const baseStringParts = loadedTranslations['qa-lead-duration-full'].split(' | ');
-        if (baseStringParts.length === 3) {
-            const timePart = baseStringParts[0];
-            let newTimePart = timePart;
-            const presentText = loadedTranslations['present-time-text'] || (currentLang === 'ru' ? 'настоящее время' : 'Present');
-            if (timePart.includes(presentText)) {
-                 newTimePart = timePart.replace(presentText, `${presentText} · ${durationString}`);
-            } else {
-                newTimePart = `${timePart} · ${durationString}`;
-            }
-            element.innerHTML = `${newTimePart} | ${baseStringParts[1]} | ${baseStringParts[2]}`;
+    // Базовая строка и текст "настоящее время"
+    const baseStringFull = (loadedTranslations && loadedTranslations['qa-lead-duration-full']) ||
+                           (currentLang === 'ru' ? "май 2024 г. – настоящее время | Gammister | ОАЭ (удаленно)" : "May 2024 – Present | Gammister | UAE (Remote)");
+    const presentTextString = (loadedTranslations && loadedTranslations['present-time-text']) ||
+                              (currentLang === 'ru' ? 'настоящее время' : 'Present');
+
+    const baseStringParts = baseStringFull.split(' | ');
+    if (baseStringParts.length === 3) {
+        const timePart = baseStringParts[0];
+        let newTimePart = timePart;
+        if (timePart.includes(presentTextString)) {
+             newTimePart = timePart.replace(presentTextString, `${presentTextString} · ${durationString}`);
         } else {
-            const presentText = loadedTranslations['present-time-text'] || (currentLang === 'ru' ? 'настоящее время' : 'Present');
-            element.innerHTML = `${loadedTranslations['qa-lead-duration-full'].replace(presentText, `${presentText} · ${durationString}`)}`;
+            // Если вдруг в строке нет "настоящее время", но мы все равно хотим добавить таймер
+            // Этого быть не должно, если ключ qa-lead-duration-full всегда содержит present-time-text
+            newTimePart = `${timePart} · ${durationString}`;
         }
-    } else if (element && !loadedTranslations['qa-lead-duration-full'] && Object.keys(loadedTranslations).length > 0) {
-        element.innerHTML = durationString;
+        element.innerHTML = `${newTimePart} | ${baseStringParts[1]} | ${baseStringParts[2]}`;
+    } else {
+        // Если формат строки неожиданный, пытаемся просто заменить "настоящее время"
+        element.innerHTML = baseStringFull.replace(presentTextString, `${presentTextString} · ${durationString}`);
     }
 }
+// --- КОНЕЦ ВОССТАНОВЛЕННОЙ updateWorkDuration ---
+
 
 document.addEventListener('DOMContentLoaded', async () => {
-    if (!document.body.classList.contains('loading-translations')) {
-        document.body.classList.add('loading-translations');
-    }
+    await initializeApp();
 
-    let langToLoad = 'ru';
-    const path = window.location.pathname;
-
-    // basePath + '/' + lang_code + '/'
-    const langPathRegex = new RegExp(`^${basePath}/(ru|en)/?$`); // ? делает последний слеш опциональным для матчинга
-    const match = path.match(langPathRegex);
-
-    if (match && match[1]) { // match[1] будет 'ru' или 'en'
-        langToLoad = match[1];
-    } else if (path === basePath || path === basePath + '/') {
-        // Если зашли на /MY_CV/ или /MY_CV, устанавливаем язык по умолчанию и редиректим
-        langToLoad = 'ru'; // Язык по умолчанию
-    }
-    // Если другой путь, который не матчится, langToLoad останется 'ru' (или что там по умолчанию)
-    // и логика ниже должна корректно обработать редирект на /ru/ или /en/
-
-    currentLang = langToLoad;
-
-    // Всегда используем URL со слешем на конце для языковых версий
-    const expectedPath = `${basePath}/${currentLang}/`;
-    const pageTitleForHistory = document.title;
-
-    // Сравниваем текущий путь (приведенный к виду со слешем) с ожидаемым
-    const currentPathForComparison = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
-
-    if (currentPathForComparison !== expectedPath) {
-        // Если зашли на /MY_CV или /MY_CV/en (без слеша), или другой некорректный путь,
-        // делаем replaceState на корректный путь со слешем.
-        history.replaceState({ lang: currentLang }, pageTitleForHistory, `${expectedPath}${window.location.search}${window.location.hash}`);
-    }
-
-    await changeLanguage(currentLang);
-
+    updateWorkDuration(); // Первый вызов для немедленного отображения
     setInterval(updateWorkDuration, 1000);
 
     const downloadPdfButton = document.getElementById('download-pdf-button');
     if (downloadPdfButton) {
         downloadPdfButton.addEventListener('click', () => {
-            let fileName = '';
-            if (currentLang === 'ru') {
-                fileName = 'Резюме - Кузнецов Владлен.pdf';
-            } else {
-                fileName = 'Resume - Kuznetsov Vladlen.pdf';
-            }
+            let fileName = (currentLang === 'ru') ? 'Резюме - Кузнецов Владлен.pdf' : 'Resume - Kuznetsov Vladlen.pdf';
             const filePath = `${basePath}/pdf/${fileName}`;
             const link = document.createElement('a');
             link.href = filePath;
@@ -353,19 +357,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         let isExternal = true;
         try {
             const linkHostname = new URL(link.href).hostname;
-            if (linkHostname === window.location.hostname) {
-                isExternal = false;
-            }
-        } catch (e) {
-            // Игнорируем
-        }
+            if (linkHostname === window.location.hostname) isExternal = false;
+        } catch (e) {/*Игнорируем*/}
 
         if (link.protocol === "mailto:" || isExternal) {
-            const isTitleLink = link.classList.contains('article-title-link') ||
-                                (link.parentElement && link.parentElement.classList.contains('timeline-content') && link.querySelector('h4'));
-
+            const isTitleLink = link.classList.contains('article-title-link') || (link.parentElement && link.parentElement.classList.contains('timeline-content') && link.querySelector('h4'));
             if (!isTitleLink) {
-                 link.setAttribute('target', 'blank');
+                 link.setAttribute('target', '_blank');
                  link.setAttribute('rel', 'noopener noreferrer');
             } else if (link.classList.contains('article-title-link')) {
                 link.setAttribute('rel', 'noopener noreferrer');
