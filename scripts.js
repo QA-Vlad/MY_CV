@@ -95,9 +95,10 @@ function updateMetaTagsForSEO() {
     head.querySelectorAll('link[rel="alternate"][hreflang], link[rel="canonical"]').forEach(tag => tag.remove());
 
     const siteOrigin = window.location.origin;
-    const ruUrl = `${siteOrigin}${basePath}/ru/`;
-    const enUrl = `${siteOrigin}${basePath}/en/`;
-    const defaultUrl = ruUrl;
+    // Используем URL с параметром spa_path
+    const ruUrl = `${siteOrigin}${basePath}/?spa_path=ru/`;
+    const enUrl = `${siteOrigin}${basePath}/?spa_path=en/`;
+    const defaultUrl = ruUrl; // Русская версия как x-default
 
     let canonicalUrl = (currentLang === 'ru') ? ruUrl : enUrl;
 
