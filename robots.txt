@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://qa-vlad.github.io/MY_CV/sitemap.xml
