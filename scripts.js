@@ -1,38 +1,40 @@
 // --- НАЧАЛО ФАЙЛА scripts.js ---
 
+// УДАЛЯЕМ самовызывающуюся функцию, которая работала с sessionStorage.
+// Вся логика начальной загрузки теперь в initializeApp.
+
 let currentLang = 'ru';
 let loadedTranslations = {};
 const toggleButton = document.getElementById('language-toggle');
 const basePath = '/MY_CV';
-
-// --- Начало initializeApp и других функций, которые НЕ меняются в этом исправлении ---
-// (Берем их из моего предыдущего ответа, где была введена initializeApp)
 
 async function initializeApp() {
     if (!document.body.classList.contains('loading-translations')) {
         document.body.classList.add('loading-translations');
     }
 
-    let langToLoad = 'ru';
-    let performPushStateInChangeLanguage = true;
+    let langToLoad = 'ru'; // Язык по умолчанию
+    let performHistoryUpdateInChangeLanguage = true;
 
     const urlParams = new URLSearchParams(window.location.search);
     const spaPathFromParam = urlParams.get('spa_path');
 
     if (spaPathFromParam) {
-        urlParams.delete('spa_path');
+        urlParams.delete('spa_path'); // Удаляем параметр spa_path
         let cleanSearch = urlParams.toString();
         if (cleanSearch) cleanSearch = '?' + cleanSearch;
 
-        let langSegment = spaPathFromParam.replace(/\/$/, "").split('/')[0];
+        // spaPathFromParam может быть "en/" или "ru" и т.д.
+        let langSegment = spaPathFromParam.replace(/\/$/, "").split('/')[0]; // Убираем конечный / перед split
         if (langSegment === 'en' || langSegment === 'ru') {
             langToLoad = langSegment;
         }
 
         const newHistoryPath = `${basePath}/${langToLoad}/${cleanSearch}${window.location.hash}`;
-        history.replaceState({ lang: langToLoad }, document.title, newHistoryPath);
-        performPushStateInChangeLanguage = false;
+        history.replaceState({ lang: langToLoad }, document.title, newHistoryPath); // Обновляем URL без spa_path
+        performHistoryUpdateInChangeLanguage = false; // URL уже установлен, не нужен pushState в changeLanguage
     } else {
+        // Логика определения языка из текущего пути, если spa_path не было
         const path = window.location.pathname;
         const langPathRegex = new RegExp(`^${basePath}/(ru|en)/?$`);
         const match = path.match(langPathRegex);
@@ -40,20 +42,22 @@ async function initializeApp() {
         if (match && match[1]) {
             langToLoad = match[1];
             const expectedPathWithSlash = `${basePath}/${langToLoad}/`;
-            if (window.location.pathname !== expectedPathWithSlash) {
+            if (window.location.pathname !== expectedPathWithSlash) { // Если URL не канонический (например, без слеша)
                 history.replaceState({ lang: langToLoad }, document.title, `${expectedPathWithSlash}${window.location.search}${window.location.hash}`);
             }
-            performPushStateInChangeLanguage = false;
-        } else if (path === basePath || path === basePath + '/' || path.endsWith('/index.html')) {
-            langToLoad = 'ru';
+            performHistoryUpdateInChangeLanguage = false; // URL уже (или только что стал) каноническим
+        } else if (path === basePath || path === basePath + '/' || path.endsWith('index.html') || path.endsWith('index')) {
+            // Если зашли на корень репозитория или index.html
+            langToLoad = 'ru'; // Язык по умолчанию
             const defaultLangPath = `${basePath}/${langToLoad}/${window.location.search}${window.location.hash}`;
             history.replaceState({ lang: langToLoad }, document.title, defaultLangPath);
-            performPushStateInChangeLanguage = false;
+            performHistoryUpdateInChangeLanguage = false;
         }
+        // Если путь совсем другой, langToLoad останется 'ru', и changeLanguage сделает pushState, если performHistoryUpdateInChangeLanguage остался true
     }
 
     currentLang = langToLoad;
-    await changeLanguage(currentLang, performPushStateInChangeLanguage);
+    await changeLanguage(currentLang, performHistoryUpdateInChangeLanguage);
 }
 
 
@@ -63,24 +67,25 @@ async function fetchTranslations(lang) {
         if (!response.ok) {
             console.error(`Failed to load ${lang}.json. Status: ${response.status}`);
             let fallbackLang = 'ru';
-            if (lang === 'ru') { // Если уже пытались загрузить 'ru' и не вышло
+            if (lang === fallbackLang) {
                  console.error("Critical error: Default language 'ru' also failed to load.");
-                 return {}; // Возвращаем пустой объект, чтобы избежать бесконечной рекурсии
+                 return {};
             }
             console.warn(`Falling back to '${fallbackLang}' from language '${lang}'`);
-            // currentLang будет обновлен в changeLanguage
+            currentLang = fallbackLang; // Обновляем currentLang немедленно при откате
             return await fetchTranslations(fallbackLang);
         }
-        // Не меняем currentLang здесь, это делает changeLanguage
+        // currentLang уже должен быть установлен правильно перед вызовом fetchTranslations
         return await response.json();
     } catch (error) {
         console.error(`Error loading translations for ${lang}:`, error);
         let fallbackLang = 'ru';
-        if (lang === 'ru') {
+        if (lang === fallbackLang) {
              console.error("Critical error: Default language 'ru' also failed to load on error.");
              return {};
         }
         console.warn(`Falling back to '${fallbackLang}' from language '${lang}' due to error.`);
+        currentLang = fallbackLang; // Обновляем currentLang немедленно при откате
         return await fetchTranslations(fallbackLang);
     }
 }
@@ -101,7 +106,7 @@ function updateMetaTagsForSEO() {
     canonicalTag.setAttribute('href', canonicalUrl);
     head.appendChild(canonicalTag);
 
-    ['ru', 'en', 'x-default'].forEach(langCode => { // изменил lang на langCode во избежание путаницы с currentLang
+    ['ru', 'en', 'x-default'].forEach(langCode => {
         const tag = document.createElement('link');
         tag.setAttribute('rel', 'alternate');
         tag.setAttribute('hreflang', langCode);
@@ -138,12 +143,10 @@ function applyTranslations() {
 
         document.querySelectorAll('[data-lang-key]').forEach(element => {
             const key = element.getAttribute('data-lang-key');
-            // Обновляем, только если ключ есть в переводах ИЛИ это не кнопка (для кнопок отдельная логика ниже)
-            if (translationsAvailable && loadedTranslations[key]) {
+            if (translationsAvailable && loadedTranslations[key] !== undefined) { // Проверяем !== undefined, чтобы пустые строки тоже применялись
                  element.innerHTML = loadedTranslations[key];
-            } else if (!translationsAvailable && element.id !== 'language-toggle' && element.id !== 'download-pdf-button' && !element.closest('#gammister-lead-duration')) {
-                // Если переводов нет, можно либо очистить, либо оставить дефолтный HTML.
-                // Пока оставим как есть, чтобы не стирать то, что уже есть в HTML.
+            } else if (!translationsAvailable && element.id !== 'language-toggle' && element.id !== 'download-pdf-button' && element.id !== 'gammister-lead-duration') {
+                 // Если переводов нет, можно очистить или оставить дефолт. Оставляем дефолт.
             }
         });
 
@@ -154,7 +157,6 @@ function applyTranslations() {
          if (downloadPdfButton) {
             downloadPdfButton.textContent = translationsAvailable ? (loadedTranslations['download-pdf-button-text'] || (currentLang === 'ru' ? 'Скачать PDF' : 'Download PDF')) : (currentLang === 'ru' ? 'Скачать PDF' : 'Download PDF');
         }
-        // updateWorkDuration будет вызван отдельно после applyTranslations
     } finally {
         document.body.classList.remove('loading-translations');
     }
@@ -166,28 +168,23 @@ async function changeLanguage(lang, needsHistoryUpdate = true) {
     }
 
     currentLang = lang;
-
-    let newTranslations = await fetchTranslations(lang); // fetchTranslations может изменить currentLang при ошибке
-    // Убедимся, что currentLang актуален ПОСЛЕ fetchTranslations, если был откат
-    if (Object.keys(newTranslations).length === 0 && lang !== 'ru' && currentLang !== 'ru') {
-        // Это условие маловероятно, если fetchTranslations корректно откатывает currentLang сам,
-        // но на всякий случай.
-        currentLang = 'ru';
-    }
-    loadedTranslations = newTranslations;
+    loadedTranslations = await fetchTranslations(lang);
+    // currentLang мог измениться внутри fetchTranslations при откате, поэтому используем его актуальное значение
 
     applyTranslations();
     updateMetaTagsForSEO();
 
     if (needsHistoryUpdate) {
-        const newPath = `${basePath}/${currentLang}/`;
-        const fullNewPath = `${newPath}${window.location.search}${window.location.hash}`;
+        const newPath = `${basePath}/${currentLang}/`; // Используем currentLang, который мог быть обновлен
         const pageTitleForHistory = document.title;
+        // search и hash уже должны быть "чистыми" после initializeApp, или их нет
+        const fullNewPath = `${newPath}${window.location.search}${window.location.hash}`;
 
         const currentPathForComparison = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
-        if (currentPathForComparison !== newPath || window.location.search + window.location.hash !== "" ) {
+        if (currentPathForComparison !== newPath) {
             history.pushState({ lang: currentLang }, pageTitleForHistory, fullNewPath);
-        } else {
+        } else if (window.location.href !== fullNewPath) {
+            // Если путь тот же, но search/hash изменились (маловероятно здесь) или просто обновить title
             history.replaceState({ lang: currentLang }, pageTitleForHistory, fullNewPath);
         }
     }
@@ -201,50 +198,40 @@ if (toggleButton) {
         changeLanguage(newLang, true);
     });
 }
-// --- Конец initializeApp и других функций ---
 
-// --- НАЧАЛО ВОССТАНОВЛЕННОЙ updateWorkDuration ---
-// Эта функция взята из вашего предоставленного кода, который работал с sessionStorage,
-// и адаптирована для работы с loadedTranslations и currentLang
+// Используем версию updateWorkDuration из вашего последнего рабочего скрипта
 function updateWorkDuration() {
-    // Проверяем, есть ли ключ в переводах, если нет, то используем дефолтную строку
-    // Это условие было в самом начале вашей версии функции
-    if (Object.keys(loadedTranslations).length === 0 || !loadedTranslations['qa-lead-duration-full']) {
-        const element = document.getElementById('gammister-lead-duration');
-        if(element && element.getAttribute('data-lang-key') === 'qa-lead-duration-full') { // && !element.textContent.includes('·') - убрал, т.к. мы всегда будем обновлять
-            // Это условие для самого первого рендера, когда translations еще могут быть не загружены
-            // или если ключ отсутствует
-            let defaultText = "";
-            if (currentLang === 'ru') {
-                defaultText = "май 2024 г. – настоящее время | Gammister | ОАЭ (удаленно)";
-            } else { // en
-                defaultText = "May 2024 – Present | Gammister | UAE (Remote)";
-            }
-            // Если ключ есть в переводах, но он пуст, то тоже используем дефолт
-            element.innerHTML = (loadedTranslations && loadedTranslations['qa-lead-duration-full']) ? loadedTranslations['qa-lead-duration-full'] : defaultText;
-        }
-        // Если ключ 'qa-lead-duration-full' отсутствует в loadedTranslations,
-        // то дальнейший код не будет корректно работать, так как baseStringParts будет неверным.
-        // Однако, если он есть, но пустой, то тоже проблема.
-        // Лучше просто выйти, если нет базовой строки для работы.
-        if (!loadedTranslations || !loadedTranslations['qa-lead-duration-full']) return;
+    const element = document.getElementById('gammister-lead-duration');
+    if (!element) return;
+
+    // Дефолтные строки, если переводы еще не загружены или ключ отсутствует
+    let baseStringFullDefault = currentLang === 'ru' ? "май 2024 г. – настоящее время | Gammister | ОАЭ (удаленно)" : "May 2024 – Present | Gammister | UAE (Remote)";
+    let presentTextDefault = currentLang === 'ru' ? 'настоящее время' : 'Present';
+    let justStartedDefault = currentLang === 'ru' ? 'только началось' : 'just started';
+
+    let yearAbbrDefault = currentLang === 'ru' ? 'г.' : 'yr';
+    let monthAbbrDefault = currentLang === 'ru' ? 'мес.' : 'mos';
+    let dayAbbrDefault = currentLang === 'ru' ? 'дн.' : 'days';
+    let hourAbbrDefault = currentLang === 'ru' ? 'ч.' : 'hrs';
+    let minuteAbbrDefault = currentLang === 'ru' ? 'мин.' : 'min';
+    let secondAbbrDefault = currentLang === 'ru' ? 'сек.' : 'sec';
+
+    const translationsAvailable = Object.keys(loadedTranslations).length > 0;
+
+    const baseStringFull = (translationsAvailable && loadedTranslations['qa-lead-duration-full']) || baseStringFullDefault;
+    const presentTextString = (translationsAvailable && loadedTranslations['present-time-text']) || presentTextDefault;
+
+    if (!baseStringFull.includes(presentTextString)) {
+        element.innerHTML = baseStringFull; // Если нет "настоящее время", просто показываем строку
+        return;
     }
 
-    const startDate = new Date('2024-05-25T00:00:00'); // Убедитесь, что эта дата верна
+    const startDate = new Date('2024-05-25T00:00:00');
     const currentDate = new Date();
     const diffInMs = currentDate - startDate;
 
-    const element = document.getElementById('gammister-lead-duration');
-    if (!element) return; // Если элемента нет на странице
-
-    if (diffInMs < 0) { // Если дата начала в будущем
-         if(loadedTranslations['qa-lead-duration-full']) {
-            element.innerHTML = loadedTranslations['qa-lead-duration-full'];
-         } else if (currentLang === 'ru') {
-            element.innerHTML = "май 2024 г. – настоящее время | Gammister | ОАЭ (удаленно)";
-         } else {
-            element.innerHTML = "May 2024 – Present | Gammister | UAE (Remote)";
-         }
+    if (diffInMs < 0) {
+         element.innerHTML = baseStringFull;
          return;
     }
 
@@ -253,90 +240,58 @@ function updateWorkDuration() {
     let totalMinutes = Math.floor(totalSeconds / 60);
     let minutes = totalMinutes % 60;
     let totalHours = Math.floor(totalMinutes / 60);
-    let hours = totalHours % 24; // Это часы текущего дня от начала отсчета, а не общие часы
-    // let totalDays = Math.floor(totalHours / 24); // Не используется в этой версии напрямую для строки
+    let hours = totalHours % 24;
 
-    // Логика из вашего работающего кода для годов, месяцев, дней
     let years = 0;
     let months = 0;
-    let tempDaysCalc = Math.floor(totalHours / 24); // Используем общее количество дней для расчета
+    let tempDaysCalc = Math.floor(totalHours / 24);
 
-    if (tempDaysCalc >= 365.25) { // Используем 365.25 для учета високосных годов
+    if (tempDaysCalc >= 365.25) {
         years = Math.floor(tempDaysCalc / 365.25);
         tempDaysCalc -= Math.floor(years * 365.25);
     }
-    if (tempDaysCalc >= 30.4375) { // Среднее количество дней в месяце
+    if (tempDaysCalc >= 30.4375) {
         months = Math.floor(tempDaysCalc / 30.4375);
         tempDaysCalc -= Math.floor(months * 30.4375);
     }
     let days = Math.floor(tempDaysCalc);
 
-
     let durationString = '';
-    // Используем loadedTranslations для аббревиатур, с откатом на дефолт
-    const yearAbbr = (loadedTranslations && loadedTranslations['year-abbr']) || (currentLang === 'ru' ? 'г.' : 'yr');
-    const monthAbbr = (loadedTranslations && loadedTranslations['month-abbr']) || (currentLang === 'ru' ? 'мес.' : 'mos');
-    const dayAbbr = (loadedTranslations && loadedTranslations['day-abbr']) || (currentLang === 'ru' ? 'дн.' : 'days');
-    const hourAbbr = (loadedTranslations && loadedTranslations['hour-abbr']) || (currentLang === 'ru' ? 'ч.' : 'hrs');
-    const minuteAbbr = (loadedTranslations && loadedTranslations['minute-abbr']) || (currentLang === 'ru' ? 'мин.' : 'min');
-    const secondAbbr = (loadedTranslations && loadedTranslations['second-abbr']) || (currentLang === 'ru' ? 'сек.' : 'sec');
+    const yearAbbr = (translationsAvailable && loadedTranslations['year-abbr']) || yearAbbrDefault;
+    const monthAbbr = (translationsAvailable && loadedTranslations['month-abbr']) || monthAbbrDefault;
+    const dayAbbr = (translationsAvailable && loadedTranslations['day-abbr']) || dayAbbrDefault;
+    const hourAbbr = (translationsAvailable && loadedTranslations['hour-abbr']) || hourAbbrDefault;
+    const minuteAbbr = (translationsAvailable && loadedTranslations['minute-abbr']) || minuteAbbrDefault;
+    const secondAbbr = (translationsAvailable && loadedTranslations['second-abbr']) || secondAbbrDefault;
 
-    // Формирование строки точно как на вашем скриншоте
     if (years > 0) durationString += `${years} ${yearAbbr} `;
-    // Месяцы показываем, даже если 0, если есть года (или если это единственный не нулевой компонент до дней)
     if (years > 0 || months > 0 ) durationString += `${months} ${monthAbbr} `;
-    // Дни показываем, если есть года/месяцы или если это единственный компонент до часов
     if (years > 0 || months > 0 || days > 0) durationString += `${days} ${dayAbbr} `;
-
-    // Часы (используем `hours` из `totalHours % 24`, так как это часы текущего дня в отсчете)
-    // или можно использовать `totalHours` если нужно общее кол-во часов. На скриншоте это похоже на `totalHours % 24`.
-    // Показываем часы, если это первый день или если есть более крупные единицы
     if (years > 0 || months > 0 || days > 0 || hours > 0) durationString += `${hours} ${hourAbbr} `;
-
-    // Минуты
     if (years > 0 || months > 0 || days > 0 || hours > 0 || minutes > 0) durationString += `${minutes} ${minuteAbbr} `;
-
-    // Секунды показываем всегда
     durationString += `${seconds} ${secondAbbr}`;
-
     durationString = durationString.trim();
 
-    // Текст "только началось"
-    const justStartedText = (loadedTranslations && loadedTranslations['duration-just-started']) || (currentLang === 'ru' ? 'только началось' : 'just started');
-    if (totalSeconds === 0) { // Строго 0 секунд
+    const justStartedText = (translationsAvailable && loadedTranslations['duration-just-started']) || justStartedDefault;
+    if (totalSeconds === 0) {
          durationString = justStartedText;
     }
-
-    // Базовая строка и текст "настоящее время"
-    const baseStringFull = (loadedTranslations && loadedTranslations['qa-lead-duration-full']) ||
-                           (currentLang === 'ru' ? "май 2024 г. – настоящее время | Gammister | ОАЭ (удаленно)" : "May 2024 – Present | Gammister | UAE (Remote)");
-    const presentTextString = (loadedTranslations && loadedTranslations['present-time-text']) ||
-                              (currentLang === 'ru' ? 'настоящее время' : 'Present');
 
     const baseStringParts = baseStringFull.split(' | ');
     if (baseStringParts.length === 3) {
         const timePart = baseStringParts[0];
-        let newTimePart = timePart;
-        if (timePart.includes(presentTextString)) {
-             newTimePart = timePart.replace(presentTextString, `${presentTextString} · ${durationString}`);
-        } else {
-            // Если вдруг в строке нет "настоящее время", но мы все равно хотим добавить таймер
-            // Этого быть не должно, если ключ qa-lead-duration-full всегда содержит present-time-text
-            newTimePart = `${timePart} · ${durationString}`;
-        }
+        let newTimePart = timePart.replace(presentTextString, `${presentTextString} · ${durationString}`);
         element.innerHTML = `${newTimePart} | ${baseStringParts[1]} | ${baseStringParts[2]}`;
     } else {
-        // Если формат строки неожиданный, пытаемся просто заменить "настоящее время"
         element.innerHTML = baseStringFull.replace(presentTextString, `${presentTextString} · ${durationString}`);
     }
 }
-// --- КОНЕЦ ВОССТАНОВЛЕННОЙ updateWorkDuration ---
 
 
 document.addEventListener('DOMContentLoaded', async () => {
     await initializeApp();
 
-    updateWorkDuration(); // Первый вызов для немедленного отображения
+    updateWorkDuration();
     setInterval(updateWorkDuration, 1000);
 
     const downloadPdfButton = document.getElementById('download-pdf-button');
@@ -358,7 +313,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const linkHostname = new URL(link.href).hostname;
             if (linkHostname === window.location.hostname) isExternal = false;
-        } catch (e) {/*Игнорируем*/}
+        } catch (e) {}
 
         if (link.protocol === "mailto:" || isExternal) {
             const isTitleLink = link.classList.contains('article-title-link') || (link.parentElement && link.parentElement.classList.contains('timeline-content') && link.querySelector('h4'));
