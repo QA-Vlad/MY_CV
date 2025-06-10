@@ -1,0 +1,15 @@
+### Example user template template
+### Example user template
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+/.idea/highlightedFiles.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/MY_CV.iml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml

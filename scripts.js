@@ -1,8 +1,3 @@
-// --- НАЧАЛО ФАЙЛА scripts.js ---
-
-// УДАЛЯЕМ самовызывающуюся функцию, которая работала с sessionStorage.
-// Вся логика начальной загрузки теперь в initializeApp.
-
 let currentLang = 'ru';
 let loadedTranslations = {};
 const toggleButton = document.getElementById('language-toggle');
@@ -327,4 +322,3 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 });
-// --- КОНЕЦ ФАЙЛА scripts.js ---

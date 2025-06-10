@@ -125,7 +125,7 @@ h3 {
     margin-left: 20px;
     margin-bottom: 30px; /* Основной отступ между блоками опыта */
 }
-/* Убираем нижний отступ у последнего элемента или если за item идет connector */
+
 .timeline > *:last-child .timeline-content,
 .timeline > .timeline-connector:last-child {
     margin-bottom: 0;
@@ -138,7 +138,7 @@ h3 {
 .timeline-item::before { /* Кружок */
     content: '';
     position: absolute;
-    left: 13px; /* Скорректировано для центрирования с обводкой */
+    left: 13px;
     top: 0;
     width: 12px;
     height: 12px;
@@ -353,7 +353,7 @@ body.loading-translations [data-lang-key] {
         padding-left: 20px;
     }
     .timeline-item::before {
-        left: 3px; /* Скорректировано для центрирования на мобильных */
+        left: 3px;
     }
     .timeline-item::after {
         left: 10px;
