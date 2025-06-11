@@ -22,6 +22,48 @@
     <!-- og:url будет обновляться скриптом -->
     <meta property="og:url" content="https://qa-vlad.github.io/MY_CV/ru/">
     <title>CV Vladlen Kuznetsov</title> <!-- Начальный заголовок -->
+
+    <base href="/">
+
+    <!--  Встроенный скрипт для определения basePath и установки href тега <base> -->
+    <!-- Этот скрипт выполняется СРАЗУ, до загрузки других ресурсов -->
+    <script>
+        // PRODUCTION_BASE_PATH должен совпадать со значением в scripts.js и 404.html.
+        // Пока scripts.js не загружен, используем строковое значение напрямую.
+        const PRODUCTION_BASE_PATH_VALUE = '/MY_CV';
+        const currentPathname = window.location.pathname;
+
+        // basePath будет PRODUCTION_BASE_PATH_VALUE, если URL начинается с PRODUCTION_BASE_PATH_VALUE + '/',
+        // или равен PRODUCTION_BASE_PATH_VALUE (для корня репозитория https://user.github.io/MY_CV).
+        // Иначе, basePath будет '' (пустая строка) для локальной разработки на корневом порту (http://localhost:порт/).
+        const determinedBasePath = currentPathname.startsWith(PRODUCTION_BASE_PATH_VALUE + '/') || currentPathname === PRODUCTION_BASE_PATH_VALUE
+            ? PRODUCTION_BASE_PATH_VALUE
+            : '';
+
+        // Определяем базовый URL для тега <base>. Он всегда должен заканчиваться на слеш.
+        const baseHref = determinedBasePath === '' ? '/' : determinedBasePath + '/';
+
+        // Находим тег <base> и устанавливаем его href
+        const baseTag = document.querySelector('base');
+        if (baseTag) {
+            baseTag.href = baseHref;
+        }
+
+        // Сохраняем определенный basePath и isLocal в глобальных переменных
+        // (или на объекте window), чтобы основной скрипт мог их использовать.
+        window.appBasePath = determinedBasePath;
+        window.isLocal = determinedBasePath === ''; // Флаг для определения локальной среды
+
+        // >>> ОТЛАДКА <<<
+        // console.log("Embedded Script Debug:");
+        // console.log("  Current Pathname:", currentPathname);
+        // console.log("  Determined basePath:", determinedBasePath);
+        // console.log("  Set <base href> to:", baseHref);
+        // console.log("  isLocal:", window.isLocal);
+        // >>> КОНЕЦ ОТЛАДКИ <<<
+
+    </script>
+
     <link rel="icon" type="image/x-icon" href="CV.png">
     <link rel="stylesheet" href="styles.css?v=1.0.6">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -158,7 +200,8 @@
             </div>
         </section>
     </main>
-     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+     <!-- Cloudflare script - might still be blocked, but leave as is -->
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 
     <script src="scripts.js"></script>
 </body>
