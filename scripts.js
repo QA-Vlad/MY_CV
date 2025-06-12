@@ -351,6 +351,7 @@ class ResumeApp {
         const translationsAvailable = Object.keys(this._loadedTranslations).length > 0;
 
         const baseStringFullDefault = this._currentLang === 'ru' ? "май 2024 г. – настоящее время | Gammister | ОАЭ (удаленно)" : "May 2024 – Present | Gammister | UAE (Remote)";
+        // Используем запасное значение, если перевод недоступен или пуст
         const baseStringFull = (((translationsAvailable && this._loadedTranslations['qa-lead-duration-full'] !== undefined) ? this._loadedTranslations['qa-lead-duration-full'] : baseStringFullDefault) || '').trim();
 
         const presentTextDefault = this._currentLang === 'ru' ? 'настоящее время' : 'Present';
@@ -393,8 +394,9 @@ class ResumeApp {
         let durationString = '';
 
         if (totalSeconds === 0) {
-             durationString = justStartedText;
+             durationString = justStartedText; // Меньше 1 секунды
         } else {
+            // Расчет компонентов времени
             let seconds = totalSeconds % 60;
             let totalMinutes = Math.floor(totalSeconds / 60);
             let minutes = totalMinutes % 60;
@@ -405,34 +407,35 @@ class ResumeApp {
             let months = 0;
             let tempDaysCalc = Math.floor(totalHours / 24);
 
-            if (tempDaysCalc >= 365.25) {
+            if (tempDaysCalc >= 365.25) { // Приближенный расчет лет
                 years = Math.floor(tempDaysCalc / 365.25);
                 tempDaysCalc -= Math.floor(years * 365.25);
             }
-            if (tempDaysCalc >= 30.4375) {
+            if (tempDaysCalc >= 30.4375) { // Приближенный расчет месяцев
                 months = Math.floor(tempDaysCalc / 30.4375);
                 tempDaysCalc -= Math.floor(months * 30.4375);
             }
-            let days = Math.floor(tempDaysCalc);
+            let days = Math.floor(tempDaysCalc); // Оставшиеся дни
 
             const parts = [];
-            if (years > 0) parts.push(`${years} ${yearAbbr}`);
-            if (months > 0) parts.push(`${months} ${monthAbbr}`);
-            if (days > 0) parts.push(`${days} ${dayAbbr}`);
-            if (hours > 0) parts.push(`${hours} ${hourAbbr}`);
-            if (minutes > 0) parts.push(`${minutes} ${minuteAbbr}`);
-            if (seconds > 0) parts.push(`${seconds} ${secondAbbr}`);
+            let hasLargerPartThanMinutes = false; // Флаг для определения, есть ли единицы > минут
 
-             if (parts.length === 0 && totalSeconds > 0) {
-                // Если длительность меньше секунды, но totalSeconds > 0 (Math.floor), покажем секунды
-                 parts.push(`${totalSeconds} ${secondAbbr}`);
-             }
+            // Добавляем компоненты, только если они > 0
+            if (years > 0) { parts.push(`${years} ${yearAbbr}`); hasLargerPartThanMinutes = true; }
+            if (months > 0) { parts.push(`${months} ${monthAbbr}`); hasLargerPartThanMinutes = true; }
+            if (days > 0) { parts.push(`${days} ${dayAbbr}`); hasLargerPartThanMinutes = true; }
+            if (hours > 0) { parts.push(`${hours} ${hourAbbr}`); hasLargerPartThanMinutes = true; }
+            if (minutes > 0) { parts.push(`${minutes} ${minuteAbbr}`); }
 
-
+            if (seconds > 0 || minutes > 0) {
+                parts.push(`${seconds.toString().padStart(2, '0')} ${secondAbbr}`);
+            }
             durationString = parts.join(' ');
         }
 
+        // Формируем итоговый HTML
         const regex = new RegExp(presentTextString, 'g');
+        // Добавляем разделитель " · " только если durationString не пустая
         const replacementString = `${presentTextString}${durationString ? ' · ' + durationString : ''}`;
         const updatedHtml = baseStringFull.replace(regex, replacementString);
 
