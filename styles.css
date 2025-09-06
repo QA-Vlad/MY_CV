@@ -33,16 +33,39 @@ body {
     background-color: #fff;
     color: #2a9d8f;
     border: 1px solid #2a9d8f;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 0.8rem;
     font-weight: bold;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(42, 157, 143, 0.1), transparent);
+    transition: left 0.5s;
 }
 
 .action-button:hover {
     background-color: #e0f2f1;
     color: #21867a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(42, 157, 143, 0.2);
+}
+
+.action-button:hover::before {
+    left: 100%;
+}
+
+.action-button:active {
+    transform: translateY(0);
 }
 
 header {
@@ -67,6 +90,13 @@ header {
     width: 200px;
     height: 200px;
     border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profile-photo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(42, 157, 143, 0.2);
 }
 
 .contacts {
@@ -91,7 +121,8 @@ main {
     padding: 20px;
     background: #fff;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 h3 {
@@ -99,6 +130,23 @@ h3 {
     border-bottom: 2px solid #2a9d8f;
     padding-bottom: 5px;
     margin-bottom: 15px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+h3::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #21867a, #2a9d8f);
+    transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+h3:hover::after {
+    width: 100%;
 }
 
 .timeline {
@@ -120,10 +168,17 @@ h3 {
 .timeline-content {
     background-color: #f1faee;
     padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
     margin-left: 20px;
     margin-bottom: 30px; /* Основной отступ между блоками опыта */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid rgba(42, 157, 143, 0.1);
+}
+
+.timeline-content:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .timeline > *:last-child .timeline-content,
@@ -192,19 +247,51 @@ h3 {
     gap: 15px;
 }
 
+.skill-box:nth-child(1) { animation-delay: 0.1s; }
+.skill-box:nth-child(2) { animation-delay: 0.15s; }
+.skill-box:nth-child(3) { animation-delay: 0.2s; }
+.skill-box:nth-child(4) { animation-delay: 0.25s; }
+.skill-box:nth-child(5) { animation-delay: 0.3s; }
+.skill-box:nth-child(6) { animation-delay: 0.35s; }
+.skill-box:nth-child(7) { animation-delay: 0.4s; }
+.skill-box:nth-child(8) { animation-delay: 0.45s; }
+.skill-box:nth-child(9) { animation-delay: 0.5s; }
+.skill-box:nth-child(10) { animation-delay: 0.55s; }
+.skill-box:nth-child(11) { animation-delay: 0.6s; }
+.skill-box:nth-child(12) { animation-delay: 0.65s; }
+.skill-box:nth-child(13) { animation-delay: 0.7s; }
+.skill-box:nth-child(14) { animation-delay: 0.75s; }
+.skill-box:nth-child(15) { animation-delay: 0.8s; }
+.skill-box:nth-child(16) { animation-delay: 0.85s; }
+.skill-box:nth-child(17) { animation-delay: 0.9s; }
+.skill-box:nth-child(18) { animation-delay: 0.95s; }
+
 .skill-box {
     background-color: #f1faee;
-    border: 1px solid #ccc;
+    border: 1px solid rgba(42, 157, 143, 0.2);
     padding: 12px;
     text-align: center;
-    border-radius: 4px;
-    box-shadow: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     cursor: default;
+    transition: all 0.2s ease;
+    opacity: 0;
+    animation: fadeInUp 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+.skill-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(42, 157, 143, 0.12);
+    border-color: rgba(42, 157, 143, 0.4);
 }
 
 body.loading-translations [data-lang-key] {
     opacity: 0;
-    transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+[data-lang-key] {
+    transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .section-certificates .certificates-content {
@@ -246,13 +333,20 @@ body.loading-translations [data-lang-key] {
 
 .language-item {
     background-color: #f1faee;
-    border: 1px solid #ccc;
+    border: 1px solid rgba(42, 157, 143, 0.2);
     padding: 12px 15px;
     text-align: left;
-    border-radius: 4px;
-    box-shadow: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     cursor: default;
     font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.language-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(42, 157, 143, 0.12);
+    border-color: rgba(42, 157, 143, 0.4);
 }
 
 .pet-projects-container {
@@ -264,9 +358,16 @@ body.loading-translations [data-lang-key] {
 .pet-project-item {
     background-color: #f1faee;
     padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(42, 157, 143, 0.1);
+    transition: all 0.3s ease;
+}
+
+.pet-project-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(42, 157, 143, 0.15), 0 3px 10px rgba(0, 0, 0, 0.08);
+    border-color: rgba(42, 157, 143, 0.2);
 }
 
 .pet-project-item .project-title-link {
@@ -328,9 +429,16 @@ body.loading-translations [data-lang-key] {
 .article-item {
     background-color: #f1faee;
     padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(42, 157, 143, 0.1);
+    transition: all 0.3s ease;
+}
+
+.article-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(42, 157, 143, 0.15), 0 3px 10px rgba(0, 0, 0, 0.08);
+    border-color: rgba(42, 157, 143, 0.2);
 }
 
 .article-item .article-title-link {
@@ -378,41 +486,77 @@ body.loading-translations [data-lang-key] {
 
 
 @keyframes slideInLeft {
-    from { transform: translateX(-100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+    from { 
+        transform: translateX(-100%); 
+        opacity: 0; 
+    }
+    to { 
+        transform: translateX(0); 
+        opacity: 1; 
+    }
 }
 
 @keyframes slideInRight {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+    from { 
+        transform: translateX(100%); 
+        opacity: 0; 
+    }
+    to { 
+        transform: translateX(0); 
+        opacity: 1; 
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .section-about {
-    animation: slideInLeft 0.5s ease-in 0.3s forwards;
+    animation: slideInLeft 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) 0.3s forwards;
+    opacity: 0;
 }
 
 .section-experience {
-    animation: slideInRight 0.5s ease-in 0.5s forwards;
+    animation: slideInRight 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) 0.5s forwards;
+    opacity: 0;
 }
 
 .section-skills {
-    animation: slideInLeft 0.5s ease-in 0.7s forwards;
+    animation: slideInLeft 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) 0.7s forwards;
+    opacity: 0;
 }
 
 .section-languages {
-    animation: slideInRight 0.5s ease-in 0.8s forwards;
+    animation: slideInRight 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) 0.8s forwards;
+    opacity: 0;
 }
 
 .section-certificates {
-    animation: slideInRight 0.5s ease-in 0.9s forwards;
+    animation: slideInRight 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) 0.9s forwards;
+    opacity: 0;
 }
 
 .section-pet-projects {
-    animation: slideInRight 0.5s ease-in 0.9s forwards;
+    animation: slideInLeft 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) 1.0s forwards;
+    opacity: 0;
 }
 
 .section-articles {
-    animation: slideInLeft 0.5s ease-in 1.0s forwards;
+    animation: slideInRight 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) 1.1s forwards;
+    opacity: 0;
+}
+
+/* Анимация для header */
+header {
+    animation: fadeInUp 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) 0.1s forwards;
+    opacity: 0;
 }
 
 

@@ -33,10 +33,15 @@
         const PRODUCTION_BASE_PATH_VALUE = '/MY_CV';
         const currentPathname = window.location.pathname;
 
-        // basePath будет PRODUCTION_BASE_PATH_VALUE, если URL начинается с PRODUCTION_BASE_PATH_VALUE + '/',
-        // или равен PRODUCTION_BASE_PATH_VALUE (для корня репозитория https://user.github.io/MY_CV).
-        // Иначе, basePath будет '' (пустая строка) для локальной разработки на корневом порту (http://localhost:порт/).
-        const determinedBasePath = currentPathname.startsWith(PRODUCTION_BASE_PATH_VALUE + '/') || currentPathname === PRODUCTION_BASE_PATH_VALUE
+        // basePath будет PRODUCTION_BASE_PATH_VALUE, если:
+        // 1. URL начинается с PRODUCTION_BASE_PATH_VALUE + '/', или
+        // 2. равен PRODUCTION_BASE_PATH_VALUE (для корня репозитория https://user.github.io/MY_CV), или
+        // 3. это GitHub Pages с spa_path параметром (когда 404.html делает редирект)
+        // Иначе, basePath будет '' (пустая строка) для локальной разработки.
+        const isGitHubPagesWithSpaPath = window.location.host === 'qa-vlad.github.io' && window.location.search.includes('spa_path=');
+        const determinedBasePath = currentPathname.startsWith(PRODUCTION_BASE_PATH_VALUE + '/') || 
+                                  currentPathname === PRODUCTION_BASE_PATH_VALUE ||
+                                  isGitHubPagesWithSpaPath
             ? PRODUCTION_BASE_PATH_VALUE
             : '';
 
@@ -57,6 +62,8 @@
         // >>> ОТЛАДКА <<<
         // console.log("Embedded Script Debug:");
         // console.log("  Current Pathname:", currentPathname);
+        // console.log("  Current Search:", window.location.search);
+        // console.log("  Current Host:", window.location.host);
         // console.log("  Determined basePath:", determinedBasePath);
         // console.log("  Set <base href> to:", baseHref);
         // console.log("  isLocal:", window.isLocal);
@@ -65,7 +72,7 @@
     </script>
 
     <link rel="icon" type="image/x-icon" href="CV.png">
-    <link rel="stylesheet" href="styles.css?v=1.0.6">
+    <link rel="stylesheet" href="styles.css?v=1.0.7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body class="loading-translations">
