@@ -23,8 +23,6 @@
     <meta property="og:url" content="https://qa-vlad.github.io/MY_CV/ru/">
     <title>CV Vladlen Kuznetsov</title> <!-- Начальный заголовок -->
 
-    <base href="/">
-
     <!--  Встроенный скрипт для определения basePath и установки href тега <base> -->
     <!-- Этот скрипт выполняется СРАЗУ, до загрузки других ресурсов -->
     <script>
@@ -51,11 +49,8 @@
         // Определяем базовый URL для тега <base>. Он всегда должен заканчиваться на слеш.
         const baseHref = determinedBasePath === '' ? '/' : determinedBasePath + '/';
 
-        // Находим тег <base> и устанавливаем его href
-        const baseTag = document.querySelector('base');
-        if (baseTag) {
-            baseTag.href = baseHref;
-        }
+        // Создаём и вставляем тег <base> динамически
+        document.write('<base href="' + baseHref + '">')
 
         // Сохраняем определенный basePath и isLocal в глобальных переменных
         // (или на объекте window), чтобы основной скрипт мог их использовать.
@@ -76,9 +71,10 @@
         // >>> КОНЕЦ ОТЛАДКИ <<<
 
     </script>
-
-    <link rel="icon" type="image/x-icon" href="./CV.png">
-    <link rel="stylesheet" href="./styles.css?v=1.0.7">
+    
+    <!-- Статические ссылки на ресурсы будут перенаправлены через base tag -->
+    <link rel="icon" type="image/x-icon" href="CV.png">
+    <link rel="stylesheet" href="styles.css?v=1.0.7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body class="loading-translations">
@@ -88,7 +84,7 @@
     </div>
     <header>
     <div class="header-content">
-        <img src="./ava.jpg" alt="" class="profile-photo" id="profile-photo">
+        <img src="ava.jpg" alt="" class="profile-photo" id="profile-photo">
         <div class="header-text">
             <button id="language-toggle" class="action-button" style="margin-bottom: 10px;"></button>
             <h1 data-lang-key="name"></h1>
@@ -241,6 +237,6 @@
         </section>
     </main>
 
-    <script src="./scripts.js"></script>
+    <script src="scripts.js"></script>
 </body>
 </html>
