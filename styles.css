@@ -255,6 +255,70 @@ body.loading-translations [data-lang-key] {
     font-size: 0.95rem;
 }
 
+.pet-projects-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.pet-project-item {
+    background-color: #f1faee;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+}
+
+.pet-project-item .project-title-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.pet-project-item .project-title-link:hover h4 {
+    text-decoration: underline;
+    color: #21867a;
+}
+
+.pet-project-item h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #2a9d8f;
+    font-size: 1.1rem;
+}
+
+.pet-project-item p {
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.6;
+}
+
+.project-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.project-link {
+    display: inline-flex;
+    align-items: center;
+    background-color: #2a9d8f;
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.project-link:hover {
+    background-color: #21867a;
+}
+
+.project-link i {
+    margin-right: 8px;
+}
+
 .articles-container {
     display: flex;
     flex-direction: column;
@@ -343,8 +407,12 @@ body.loading-translations [data-lang-key] {
     animation: slideInRight 0.5s ease-in 0.9s forwards;
 }
 
+.section-pet-projects {
+    animation: slideInRight 0.5s ease-in 0.9s forwards;
+}
+
 .section-articles {
-    animation: slideInLeft 0.5s ease-in 0.9s forwards;
+    animation: slideInLeft 0.5s ease-in 1.0s forwards;
 }
 
 
@@ -480,13 +548,14 @@ body.loading-translations [data-lang-key] {
     .contacts a[href*="mailto:"]::after,
     .article-link[href^="http"]::after,
     .article-title-link[href^="http"]::after,
+    .project-link[href^="http"]::after,
+    .project-title-link[href^="http"]::after,
     .timeline-content .article-title-link[href^="http"]::after {
          content: "" !important;
     }
 
 
     .slide-in-left, .slide-in-right {
-        animation: none !important;
         opacity: 1 !important;
         transform: none !important;
     }
@@ -569,7 +638,7 @@ body.loading-translations [data-lang-key] {
     }
 
 
-    .timeline-content, .skill-box, .language-item, .article-item {
+    .timeline-content, .skill-box, .language-item, .article-item, .pet-project-item {
         background-color: #f9f9f9 !important;
         border: 1px solid #ddd !important;
         box-shadow: none !important;

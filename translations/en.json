@@ -63,6 +63,14 @@
   "lang-russian": "Russian – Native",
   "lang-vietnamese": "Vietnamese – A2",
 
+  "pet-projects-title": "Pet Projects",
+  "pet-project-1-title": "ADB Device Manager - JetBrains IDEs Plugin",
+  "pet-project-1-description": "A plugin for managing Android devices directly from the IDE. Enables testing mobile apps across various screen configurations without switching physical devices. Key features: quick screen size and DPI adjustments, wireless device connection, screen mirroring via scrcpy, preset system with 200+ popular devices, automatic app restart after resolution changes.",
+  "pet-project-1-link-text": "View on JetBrains Marketplace",
+  "pet-project-2-title": "Copy Problem Plus - JetBrains IDEs Plugin",
+  "pet-project-2-description": "A plugin for enhanced copying of errors and warnings from the Problems panel in JetBrains IDEs. Copies errors with full context: file name, line number, and problem description. Supports batch copying of all errors from a file in one action.",
+  "pet-project-2-link-text": "View on JetBrains Marketplace",
+  
   "articles-title": "My Articles",
   "article-1-title": "How I Sped Up Log Analysis in a Mobile Game with a Python Converter",
   "article-1-description": "My first publication on Habr. I'm proud of it as it managed to pass the strict 'sandbox' selection and immediately get into the main section of the site.",
