@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <title>CV Vladlen Kuznetsov - Redirecting...</title>
     <script type="text/javascript">
-      var segmentCount = 1;
-      var l = window.location;
-      var homePathSegments = l.pathname.split('/').slice(0, 1 + segmentCount);
-      var homePath = homePathSegments.join('/');
+      const segmentCount = 0;
+      const l = window.location;
+      const homePathSegments = l.pathname.split('/').slice(0, 1 + segmentCount);
+      let homePath = homePathSegments.join('/');
       if (homePathSegments.length > 1 && !homePath.endsWith('/')) {
           homePath += '/';
       } else if (homePathSegments.length === 1 && homePath === '') {
           homePath = '/';
       }
 
-      var fullPath = l.pathname;
-      var basePathForSlice = l.pathname.split('/').slice(0, 1 + segmentCount).join('/');
+      const fullPath = l.pathname;
+      const basePathForSlice = l.pathname.split('/').slice(0, 1 + segmentCount).join('/');
 
-      var spaRedirectPath = '';
+      let spaRedirectPath = '';
       if (fullPath.length > basePathForSlice.length) {
         // Убираем начальный слеш, если он есть после basePathForSlice, и сохраняем конечный, если он был
         spaRedirectPath = fullPath.substring(basePathForSlice.length);
@@ -26,7 +26,7 @@
         }
       }
 
-      var redirectUrl = homePath;
+      let redirectUrl = homePath;
 
       if (spaRedirectPath) {
         redirectUrl += '?spa_path=' + encodeURIComponent(spaRedirectPath);
@@ -44,9 +44,9 @@
   <body>
     If you are not redirected automatically, please <a id="redirect-link" href="/MY_CV/">click here</a>.
     <script type="text/javascript">
-      var lForLink = window.location;
-      var homePathForLinkSegments = lForLink.pathname.split('/').slice(0, 1 + 1);
-      var homePathForLink = homePathForLinkSegments.join('/');
+      const lForLink = window.location;
+      const homePathForLinkSegments = lForLink.pathname.split('/').slice(0, 1 + 1);
+      let homePathForLink = homePathForLinkSegments.join('/');
       if (homePathForLinkSegments.length > 1 && !homePathForLink.endsWith('/')) {
           homePathForLink += '/';
       } else if (homePathForLinkSegments.length === 1 && homePathForLink === '') {

@@ -38,10 +38,13 @@
         // 2. равен PRODUCTION_BASE_PATH_VALUE (для корня репозитория https://user.github.io/MY_CV), или
         // 3. это GitHub Pages с spa_path параметром (когда 404.html делает редирект)
         // Иначе, basePath будет '' (пустая строка) для локальной разработки.
-        const isGitHubPagesWithSpaPath = window.location.host === 'qa-vlad.github.io' && window.location.search.includes('spa_path=');
-        const determinedBasePath = currentPathname.startsWith(PRODUCTION_BASE_PATH_VALUE + '/') || 
-                                  currentPathname === PRODUCTION_BASE_PATH_VALUE ||
-                                  isGitHubPagesWithSpaPath
+        const isGitHubPages = window.location.host === 'qa-vlad.github.io';
+        const hasSpaPath = window.location.search.includes('spa_path=');
+        const isProductionPath = currentPathname.startsWith(PRODUCTION_BASE_PATH_VALUE + '/') || 
+                                currentPathname === PRODUCTION_BASE_PATH_VALUE ||
+                                currentPathname === PRODUCTION_BASE_PATH_VALUE + '/';
+        
+        const determinedBasePath = (isGitHubPages || isProductionPath || hasSpaPath)
             ? PRODUCTION_BASE_PATH_VALUE
             : '';
 
@@ -60,13 +63,16 @@
         window.isLocal = determinedBasePath === ''; // Флаг для определения локальной среды
 
         // >>> ОТЛАДКА <<<
-        // console.log("Embedded Script Debug:");
-        // console.log("  Current Pathname:", currentPathname);
-        // console.log("  Current Search:", window.location.search);
-        // console.log("  Current Host:", window.location.host);
-        // console.log("  Determined basePath:", determinedBasePath);
-        // console.log("  Set <base href> to:", baseHref);
-        // console.log("  isLocal:", window.isLocal);
+        console.log("Embedded Script Debug:");
+        console.log("  Current Pathname:", currentPathname);
+        console.log("  Current Search:", window.location.search);
+        console.log("  Current Host:", window.location.host);
+        console.log("  isGitHubPages:", isGitHubPages);
+        console.log("  hasSpaPath:", hasSpaPath);
+        console.log("  isProductionPath:", isProductionPath);
+        console.log("  Determined basePath:", determinedBasePath);
+        console.log("  Set <base href> to:", baseHref);
+        console.log("  isLocal:", window.isLocal);
         // >>> КОНЕЦ ОТЛАДКИ <<<
 
     </script>
