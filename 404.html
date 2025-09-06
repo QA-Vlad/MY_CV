@@ -4,55 +4,68 @@
     <meta charset="utf-8">
     <title>CV Vladlen Kuznetsov - Redirecting...</title>
     <script type="text/javascript">
-      const segmentCount = 0;
+      // Конфигурация для GitHub Pages
+      const PRODUCTION_BASE_PATH = '/MY_CV';
+      const isGitHubPages = window.location.host === 'qa-vlad.github.io';
+      
       const l = window.location;
-      const homePathSegments = l.pathname.split('/').slice(0, 1 + segmentCount);
-      let homePath = homePathSegments.join('/');
-      if (homePathSegments.length > 1 && !homePath.endsWith('/')) {
-          homePath += '/';
-      } else if (homePathSegments.length === 1 && homePath === '') {
-          homePath = '/';
-      }
-
-      const fullPath = l.pathname;
-      const basePathForSlice = l.pathname.split('/').slice(0, 1 + segmentCount).join('/');
-
-      let spaRedirectPath = '';
-      if (fullPath.length > basePathForSlice.length) {
-        // Убираем начальный слеш, если он есть после basePathForSlice, и сохраняем конечный, если он был
-        spaRedirectPath = fullPath.substring(basePathForSlice.length);
-        if (spaRedirectPath.startsWith('/')) {
-            spaRedirectPath = spaRedirectPath.substring(1);
+      const pathname = l.pathname;
+      
+      // Определяем базовый путь
+      let basePath;
+      let spaPath = '';
+      
+      if (isGitHubPages) {
+        // На GitHub Pages всегда используем PRODUCTION_BASE_PATH
+        basePath = PRODUCTION_BASE_PATH;
+        
+        // Извлекаем путь после /MY_CV/
+        if (pathname.startsWith(PRODUCTION_BASE_PATH + '/')) {
+          spaPath = pathname.substring(PRODUCTION_BASE_PATH.length + 1);
+        } else if (pathname.startsWith(PRODUCTION_BASE_PATH)) {
+          spaPath = pathname.substring(PRODUCTION_BASE_PATH.length);
         }
-      }
-
-      let redirectUrl = homePath;
-
-      if (spaRedirectPath) {
-        redirectUrl += '?spa_path=' + encodeURIComponent(spaRedirectPath);
-        redirectUrl += l.search; // Добавляем оригинальные search параметры ПОСЛЕ ?spa_path= (если spa_path есть)
-                                 // Если search уже есть, encodeURIComponent(spaRedirectPath) будет первым параметром.
-                                 // Если search нет, будет ?spa_path=...
       } else {
-        redirectUrl += l.search; // Если нет spa_path, просто добавляем оригинальный search
+        // Локальная разработка
+        basePath = '';
+        spaPath = pathname.substring(1); // Убираем начальный слеш
+      }
+      
+      // Формируем URL для редиректа
+      let redirectUrl = basePath + '/';
+      
+      if (spaPath && spaPath !== '/') {
+        // Убираем начальный слеш если есть
+        if (spaPath.startsWith('/')) {
+          spaPath = spaPath.substring(1);
+        }
+        redirectUrl += '?spa_path=' + encodeURIComponent(spaPath);
+      }
+      
+      // Добавляем оригинальные параметры и хеш
+      if (l.search && !spaPath) {
+        redirectUrl += l.search;
+      } else if (l.search && spaPath) {
+        redirectUrl += '&' + l.search.substring(1);
       }
       redirectUrl += l.hash;
-
+      
+      // Отладка
+      console.log('404.html redirect debug:');
+      console.log('  pathname:', pathname);
+      console.log('  basePath:', basePath);
+      console.log('  spaPath:', spaPath);
+      console.log('  redirectUrl:', redirectUrl);
+      
       l.replace(redirectUrl);
     </script>
   </head>
   <body>
     If you are not redirected automatically, please <a id="redirect-link" href="/MY_CV/">click here</a>.
     <script type="text/javascript">
-      const lForLink = window.location;
-      const homePathForLinkSegments = lForLink.pathname.split('/').slice(0, 1 + 1);
-      let homePathForLink = homePathForLinkSegments.join('/');
-      if (homePathForLinkSegments.length > 1 && !homePathForLink.endsWith('/')) {
-          homePathForLink += '/';
-      } else if (homePathForLinkSegments.length === 1 && homePathForLink === '') {
-          homePathForLink = '/';
-      }
-      document.getElementById('redirect-link').href = homePathForLink;
+      const isGitHubPagesForLink = window.location.host === 'qa-vlad.github.io';
+      const linkPath = isGitHubPagesForLink ? '/MY_CV/' : '/';
+      document.getElementById('redirect-link').href = linkPath;
     </script>
   </body>
 </html>
